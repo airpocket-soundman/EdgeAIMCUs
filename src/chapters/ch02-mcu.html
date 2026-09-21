@@ -1,0 +1,133 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第2章</span>
+  <h1>マイコン（MCU）ってなに？</h1>
+  <p class="chapter-lead">指先ほどのチップに、コンピュータがまるごと1台。まずは主役の自己紹介から始めましょう。</p>
+</div>
+
+<h2>チップ1個でコンピュータ1台</h2>
+
+<p><b>マイコン</b>は「マイクロコントローラ（Microcontroller Unit）」の略で、英語では <b>MCU</b> と書きます。</p>
+
+<p>パソコンの中を開けると、CPU、メモリ、ストレージ（SSD）、いろいろな接続端子が、それぞれ別の部品として並んでいます。マイコンは、それを<strong>ぜんぶ1つのチップに詰め込んだもの</strong>です。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 640 270" role="img" aria-label="マイコンの中身の模式図">
+      <rect x="120" y="20" width="400" height="230" rx="22" class="accent-soft"/>
+      <text x="320" y="48" font-size="15" text-anchor="middle" font-weight="800">マイコン（1チップ）</text>
+      <rect x="145" y="65" width="110" height="70" rx="12" class="accent"/>
+      <text x="200" y="97" font-size="15" text-anchor="middle" class="on-accent" font-weight="800">CPU</text>
+      <text x="200" y="118" font-size="12" text-anchor="middle" class="on-accent">計算する</text>
+      <rect x="265" y="65" width="110" height="70" rx="12" class="surface"/>
+      <text x="320" y="97" font-size="15" text-anchor="middle" font-weight="800">Flash</text>
+      <text x="320" y="118" font-size="12" text-anchor="middle" class="muted">プログラムを保存</text>
+      <rect x="385" y="65" width="110" height="70" rx="12" class="surface"/>
+      <text x="440" y="97" font-size="15" text-anchor="middle" font-weight="800">SRAM</text>
+      <text x="440" y="118" font-size="12" text-anchor="middle" class="muted">作業用の机</text>
+      <rect x="145" y="150" width="350" height="80" rx="12" class="teal-soft"/>
+      <text x="320" y="178" font-size="15" text-anchor="middle" font-weight="800">周辺機能（ペリフェラル）</text>
+      <text x="320" y="204" font-size="12" text-anchor="middle" class="muted">GPIO・ADC・I2C・SPI・UART・I2S・カメラ入力・タイマー・DMA…</text>
+      <text x="60" y="130" font-size="13" text-anchor="middle">センサー</text>
+      <text x="60" y="150" font-size="13" text-anchor="middle">マイク</text>
+      <text x="60" y="170" font-size="13" text-anchor="middle">カメラ</text>
+      <line x1="95" y1="150" x2="140" y2="185" class="stroke" stroke-width="2"/>
+      <text x="580" y="140" font-size="13" text-anchor="middle">LED</text>
+      <text x="580" y="160" font-size="13" text-anchor="middle">モーター</text>
+      <text x="580" y="180" font-size="13" text-anchor="middle">画面</text>
+      <line x1="500" y1="185" x2="545" y2="160" class="stroke" stroke-width="2"/>
+    </svg>
+  </div>
+  <figcaption>図2-1 マイコンの中身。CPU・メモリ・入出力が1つのチップに同居しています。</figcaption>
+</figure>
+
+<p>電子レンジ、炊飯器、エアコンのリモコン、車、おもちゃ。家の中を見渡すと、マイコンは数十個は隠れているはず。<strong>世界でいちばんたくさん使われているコンピュータ</strong>、それがマイコンです。</p>
+
+<h2>パソコンや Raspberry Pi とくらべてみよう</h2>
+
+<p>ざっくり比べると、マイコンの「小ささ」がよくわかります。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>パソコン</th><th>Raspberry Pi 5</th><th>マイコン（ESP32-S3 の例）</th></tr></thead>
+  <tbody>
+    <tr><td>CPUの速さ</td><td>数GHz × 多コア</td><td>2.4GHz × 4コア</td><td><b>240MHz × 2コア</b></td></tr>
+    <tr><td>作業用メモリ</td><td>16GB〜</td><td>2〜16GB</td><td><b>512KB</b>（＋外付けPSRAM 数MB）</td></tr>
+    <tr><td>保存用メモリ</td><td>SSD 数百GB〜</td><td>microSD 数十GB〜</td><td><b>Flash 数MB〜16MB</b></td></tr>
+    <tr><td>OS</td><td>Windows / macOS / Linux</td><td>Linux</td><td>なし、または小さなRTOS</td></tr>
+    <tr><td>電源を入れてから動くまで</td><td>数十秒</td><td>十数秒</td><td><b>一瞬（数十ミリ秒〜）</b></td></tr>
+    <tr><td>消費電力</td><td>数十W〜</td><td>数W</td><td><b>数十mW〜数百mW</b>（眠れば μW 級）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>メモリは Raspberry Pi の約1万分の1。数字だけ見ると心細いですね。でも逆に言えば、<strong>電池で何日も動いて、電源を入れた瞬間から仕事を始められて、1個数百円</strong>。この身軽さがマイコンの最大の武器です。</p>
+
+<div class="box tip">
+  <span class="box-title">ヒント</span>
+  <p>単位の感覚をつかんでおきましょう。1MB（メガバイト）＝1024KB（キロバイト）、1KB＝1024バイトです。スマホで撮った写真1枚が数MBなので、マイコンの作業用メモリには、写真1枚すら丸ごとは入らないことが多いんです。</p>
+</div>
+
+<h2>2種類のメモリ：Flash と SRAM</h2>
+
+<p>マイコンでAIを動かすとき、いちばん気にするのがメモリです。マイコンには性格のちがう2種類のメモリがあります。</p>
+
+<ul>
+  <li><b>Flash（フラッシュ）</b>：電源を切っても消えない「本棚」。プログラムや、AIが学習で覚えた数値（<b>重み</b>）を置いておきます。容量は数百KB〜数MB。</li>
+  <li><b>SRAM（エスラム）</b>：電源を切ると消える「作業机」。計算の途中経過や、マイクやカメラから入ってきたデータを広げておく場所です。容量は数十KB〜数MBで、Flash より小さいのがふつう。</li>
+</ul>
+
+<p>AIの計算は、本棚（Flash）から重みを読みつつ、机（SRAM）の上で途中の結果を広げながら進みます。<strong>机が狭いと、大きな計算は広げきれない</strong>。マイコンでAIを動かすときの工夫の多くは、この机をどう上手に使うか、という話になります。</p>
+
+<p>最近は、チップの外に <b>PSRAM</b> という大きめのメモリ（数MB〜32MB）を追加できるマイコンも増えました。机の横に補助テーブルを置くイメージです。ちょっと遠いので速さは落ちますが、画像を扱うときにはとても頼りになります。</p>
+
+<h2>外の世界とつながる「周辺機能」</h2>
+
+<p>マイコンの本領は、センサーやモーターといった外の世界とじかにつながれることです。そのための機能を<b>周辺機能（ペリフェラル）</b>と呼びます。エッジAIでよく使うものを紹介しましょう。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>名前</th><th>なにをする？</th><th>エッジAIでの出番</th></tr></thead>
+  <tbody>
+    <tr><td>GPIO</td><td>ピンをON/OFFする、ON/OFFを読む</td><td>LEDで結果を表示、ボタンで録音開始</td></tr>
+    <tr><td>ADC</td><td>電圧を数値に変える</td><td>アナログマイク、振動センサー</td></tr>
+    <tr><td>I2C / SPI</td><td>センサーと数本の線で会話する</td><td>加速度センサー、距離センサー、画面</td></tr>
+    <tr><td>I2S / PDM / SAI</td><td>音声データを途切れなく受け取る</td><td>デジタルマイク（キーワード検出、音の分類）</td></tr>
+    <tr><td>カメラ入力（DVP / MIPI CSI）</td><td>カメラの画像を受け取る</td><td>人の検出、ものの見分け</td></tr>
+    <tr><td>DMA</td><td>CPUを使わずにデータを運ぶ</td><td>音や画像を受け取りながら、同時にAIを計算</td></tr>
+    <tr><td>タイマー / PWM</td><td>正確な時間を刻む、モーターを回す</td><td>一定間隔でセンサーを読む、結果でロボットを動かす</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>マイコンの「頭脳」いろいろ</h2>
+
+<p>マイコンのCPU部分は<b>コア</b>と呼ばれ、いくつかの流派があります。</p>
+
+<ul>
+  <li><b>Arm Cortex-M シリーズ</b>：いちばんの大所帯。STM32、NXP の MCX、Raspberry Pi の RP2040 / RP2350 などが採用しています。
+    <ul>
+      <li>Cortex-M0+：小さくて省エネ。AIには少し非力。</li>
+      <li>Cortex-M4 / M33：<b>DSP命令</b>（信号処理向けの便利な命令）を持ち、AIの入門にちょうどいい。</li>
+      <li>Cortex-M7：速さ重視のパワー型。</li>
+      <li>Cortex-M55 / M85：<b>Helium</b> というベクトル命令を持つ、AI時代のコア。</li>
+    </ul>
+  </li>
+  <li><b>Xtensa</b>：Espressif の ESP32 / ESP32-S3 が採用。ESP32-S3 はAI向けのベクトル命令を追加しています。</li>
+  <li><b>RISC-V</b>：自由に使えるオープンな命令セット。ESP32-C3 / C6 / P4、RP2350（切り替え式）、Sipeed の K210 などが採用。</li>
+</ul>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道</span>
+  <p>AIの計算の9割以上は「かけ算して、足す」の繰り返しです。これを <b>積和演算（MAC：Multiply-Accumulate）</b> と呼びます。DSP命令やベクトル命令は、この積和演算を1回の命令で2個、4個、16個……とまとめて計算できるしかけ。だから同じクロック周波数でも、こうした命令があるかないかでAIの速さが何倍も変わります。</p>
+</div>
+
+<h2>そして、NPU を積んだマイコンの登場</h2>
+
+<p>ここ数年で、マイコンの世界に新しい仲間が加わりました。<b>NPU（Neural Processing Unit）</b>、つまり<strong>AIの計算専用の回路</strong>を内蔵したマイコンです。</p>
+
+<p>たとえば NXP の MCX N947 には「eIQ Neutron NPU」が載っていて、CPUだけで計算するより何十倍も速く画像認識ができる、とうたわれています。マイコンの世界でも「AI専用エンジン」が当たり前になりつつあるんですね。どんなマイコンがあるのかは、4章でじっくり見ていきます。</p>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>手元にマイコンボードがあれば、使われているチップの型番を調べて、メーカーのデータシートで「CPUコアの種類」「Flash と SRAM の容量」を探してみましょう。この3つがわかれば、そのマイコンでどれくらいのAIが動きそうか、だいたい見当がつくようになります（見当のつけ方は3章で）。</p>
+</div>

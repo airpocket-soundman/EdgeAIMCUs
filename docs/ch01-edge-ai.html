@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1章 エッジAIってなに？｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html" class="current"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第1章</span>
+  <h1>エッジAIってなに？</h1>
+  <p class="chapter-lead">AIはクラウドの大きなコンピュータだけのものじゃありません。手のひらの小さな基板の上でも、ちゃんと「考える」ことができるんです。</p>
+</div>
+
+<h2>AIは「どこで」動いている？</h2>
+
+<p>スマホに話しかけると答えが返ってくる。写真を撮ると、写っているのが犬か猫かを教えてくれる。いまやAIは身近な存在ですね。</p>
+
+<p>では、その「考えている」処理は、いったい<strong>どこで</strong>動いているのでしょう？</p>
+
+<p>大きく分けると2つの場所があります。</p>
+
+<ul>
+  <li><b>クラウドAI</b>：データをインターネットの向こうにある大きなサーバーへ送って、そこで計算して、結果だけを返してもらう方式。ChatGPT や Claude のような大規模言語モデルは、ほとんどがこちらです。</li>
+  <li><b>エッジAI</b>：データが生まれる「その場」、つまりセンサーやカメラのすぐそばにある機器の中で計算してしまう方式。</li>
+</ul>
+
+<p>「エッジ（edge）」は英語で「ふち」「端っこ」という意味です。インターネットを大きな網にたとえたとき、その一番外側、現実世界と接しているところ。そこでAIを動かすから<strong>エッジAI</strong>と呼びます。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 680 250" role="img" aria-label="クラウドAIとエッジAIのデータの流れの比較">
+      <!-- cloud row -->
+      <text x="10" y="30" font-size="15" font-weight="800">クラウドAI</text>
+      <rect x="10" y="45" width="120" height="60" rx="12" class="surface"/>
+      <text x="70" y="80" font-size="14" text-anchor="middle">センサー</text>
+      <line x1="135" y1="75" x2="275" y2="75" class="stroke" stroke-width="2" stroke-dasharray="6 5"/>
+      <text x="205" y="65" font-size="12" text-anchor="middle" class="muted">データを送る</text>
+      <polygon points="275,69 287,75 275,81" class="accent"/>
+      <rect x="290" y="40" width="160" height="70" rx="35" class="violet-soft"/>
+      <text x="370" y="72" font-size="14" text-anchor="middle">クラウド</text>
+      <text x="370" y="92" font-size="12" text-anchor="middle" class="muted">ここでAIが考える</text>
+      <line x1="455" y1="75" x2="545" y2="75" class="stroke" stroke-width="2" stroke-dasharray="6 5"/>
+      <polygon points="545,69 557,75 545,81" class="accent"/>
+      <text x="500" y="65" font-size="12" text-anchor="middle" class="muted">結果が返る</text>
+      <rect x="560" y="45" width="110" height="60" rx="12" class="surface"/>
+      <text x="615" y="80" font-size="14" text-anchor="middle">動作</text>
+      <!-- edge row -->
+      <text x="10" y="160" font-size="15" font-weight="800">エッジAI</text>
+      <rect x="10" y="175" width="420" height="60" rx="14" class="accent-soft"/>
+      <rect x="25" y="185" width="110" height="40" rx="10" class="surface"/>
+      <text x="80" y="211" font-size="14" text-anchor="middle">センサー</text>
+      <polygon points="145,199 157,205 145,211" class="accent"/>
+      <rect x="165" y="185" width="140" height="40" rx="10" class="accent"/>
+      <text x="235" y="211" font-size="14" text-anchor="middle" class="on-accent" font-weight="800">マイコンのAI</text>
+      <polygon points="315,199 327,205 315,211" class="accent"/>
+      <rect x="335" y="185" width="80" height="40" rx="10" class="surface"/>
+      <text x="375" y="211" font-size="14" text-anchor="middle">動作</text>
+      <text x="450" y="200" font-size="13">ぜんぶ手元の</text>
+      <text x="450" y="220" font-size="13">基板の上で完結！</text>
+    </svg>
+  </div>
+  <figcaption>図1-1 クラウドAIは「送って、考えてもらって、返してもらう」。エッジAIは「その場で考える」。</figcaption>
+</figure>
+
+<h2>その場で考えると、なにがうれしい？</h2>
+
+<p>「クラウドのほうが頭のいいAIが使えるなら、全部クラウドでいいのでは？」と思うかもしれません。ところが、その場で考えることには、クラウドにはマネできないうれしさがたくさんあります。</p>
+
+<div class="cards">
+  <div class="card"><div class="card-emoji">⚡</div><h4>とにかく速い</h4><p>ネットの往復がないので、反応までの時間（レイテンシ）がとても短い。音に合わせてロボットが動く、みたいな用途にぴったり。</p></div>
+  <div class="card"><div class="card-emoji">📶</div><h4>ネットがなくても動く</h4><p>山の中でも、工場の片隅でも、Wi-Fi が切れていても大丈夫。</p></div>
+  <div class="card"><div class="card-emoji">🔒</div><h4>データが外に出ない</h4><p>カメラの映像やマイクの音声を、どこにも送らずに処理できます。プライバシーの面で安心。</p></div>
+  <div class="card"><div class="card-emoji">🔋</div><h4>電池で動く</h4><p>通信は意外と電気を食います。送らずに済めば、電池一本で何か月も動く機器だって作れます。</p></div>
+  <div class="card"><div class="card-emoji">💰</div><h4>安い</h4><p>数百円〜数千円のチップで動くうえ、クラウドの利用料もかかりません。</p></div>
+</div>
+
+<p>もちろん弱点もあります。手元の機器は計算の力もメモリも小さいので、ChatGPT のような巨大なAIはそのままでは動きません。<strong>「小さくて、賢さもほどほど。でも速くて安くて省エネ」</strong>。それがエッジAIの持ち味です。</p>
+
+<h2>エッジにもいろいろある</h2>
+
+<p>ひとくちに「エッジ」といっても、実はその中にも大きさの段階があります。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>段階</th><th>代表例</th><th>メモリの目安</th><th>消費電力の目安</th><th>得意なこと</th></tr></thead>
+  <tbody>
+    <tr><td>エッジサーバー</td><td>GPU付きPC、Jetson</td><td>数GB〜数十GB</td><td>数十W〜数百W</td><td>大きな画像認識、小さめのLLM</td></tr>
+    <tr><td>シングルボードコンピュータ（SBC）</td><td>Raspberry Pi、AI用SoC搭載ボード</td><td>数百MB〜数GB</td><td>数W</td><td>カメラの物体検出、音声認識</td></tr>
+    <tr><td><b>マイコン（MCU）</b></td><td>ESP32、STM32、RP2040 など</td><td><b>数十KB〜数MB</b></td><td><b>数mW〜数百mW</b></td><td>音・振動・小さな画像の「分類」や「検出」</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>この本の主役は、いちばん下の段、<strong>マイコン</strong>です。メモリは Raspberry Pi の数千分の一。それでも、ちゃんとAIが動きます。この「小さな世界でAIを動かす」分野は、<b>TinyML</b>（タイニー・エムエル）とも呼ばれています。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道</span>
+  <p>「学習」と「推論」という言葉を覚えておくと、この先がぐっと読みやすくなります。</p>
+  <ul>
+    <li><b>学習</b>：たくさんのデータを見せて、AIに答え方を覚えさせること。ものすごく計算が重いので、ふつうはパソコンやクラウドでやります。</li>
+    <li><b>推論</b>：覚えたAIに新しいデータを見せて、答えを出させること。こちらは軽いので、マイコンでもできます。</li>
+  </ul>
+  <p>つまりエッジAIの多くは<strong>「学習はパソコンで、推論はマイコンで」</strong>という分業スタイル。これは3章でくわしく見ていきます。</p>
+</div>
+
+<h2>じつはもう、身のまわりにいる</h2>
+
+<p>マイコンの上で動く小さなAIは、気づかないうちにあちこちで働いています。</p>
+
+<ul>
+  <li><b>スマートスピーカーの「ウェイクワード」</b>：「OK、〇〇」と呼びかけられたかどうかは、本体の中の小さなAIがずっと聞き耳を立てて判定しています。呼ばれてから初めてクラウドにつなぐので、ふだんの会話が全部送られるわけではありません。</li>
+  <li><b>スマートウォッチの動き検出</b>：歩いている、走っている、転んだ。腕の加速度センサーの揺れ方から判断しています。</li>
+  <li><b>工場の機械の見張り番</b>：モーターの振動や音が「いつもと違う」ことに気づいて、壊れる前に知らせてくれます。</li>
+  <li><b>家電</b>：部屋の中の人の位置を見つけるエアコン、汚れ具合を判断する洗濯機など。</li>
+</ul>
+
+<h2>この本で目指すこと</h2>
+
+<p>この本は、エッジAIを<strong>「ライトに、気軽に、楽しむ」</strong>ための本です。</p>
+
+<p>最先端の研究をするわけではありません。数千円のマイコンボードを買ってきて、マイクや加速度センサーやカメラをつないで、「お、ちゃんと当たった！」とニヤッとする。そんな体験を、いろいろなマイコンで味わっていきます。</p>
+
+<ul>
+  <li>第1部（1〜4章）では、エッジAIとマイコンの基本、そして「マイコンでAIが動くしくみ」をやさしく説明します。</li>
+  <li>第2部（5章〜）では、実際のマイコンボードを1つずつ取り上げて、ボードの紹介と、作者が作ってきた実例を紹介します。</li>
+</ul>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>身のまわりの電化製品を1つ選んで、「この中でAIが動いているとしたら、何を判断しているだろう？」と想像してみてください。どんなセンサーから、何を見分けているのか。この問いは、あとで自分の作品を考えるときの練習になります。</p>
+</div>
+
+<nav class="pager"><a class="prev" href="index.html"><small>← まえへ</small> はじめに</a><a class="next" href="ch02-mcu.html"><small>つぎへ →</small>2章 マイコン（MCU）ってなに？</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

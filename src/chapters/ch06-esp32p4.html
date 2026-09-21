@@ -1,0 +1,94 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第6章</span>
+  <h1>ESP32-P4（M5Stack Tab5）</h1>
+  <p class="chapter-lead">マイコンで、顔の画像を「生成」する。そんな夢みたいなことが、手のひらのタブレットで起きています。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>ESP32-P4</b> は、Espressif の ESP32 シリーズの中でも<strong>パワー担当</strong>のマイコンです。Wi-Fi は持たないかわりに、速いRISC-Vコア、大きな PSRAM、カメラや大画面をつなぐ高速なインターフェースを備えています。</p>
+
+<p>それを1280×720 の大きなタッチ画面と一緒にタブレットにしたのが、<b>M5Stack Tab5</b> です。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>Espressif ESP32-P4</td></tr>
+    <tr><th>コア</th><td>RISC-V ×2（高性能側、最大400MHz。Tab5 は 360MHz 動作）＋ 省電力用の RISC-V コア</td></tr>
+    <tr><th>SRAM</th><td>768KB</td></tr>
+    <tr><th>PSRAM</th><td>Tab5 は 32MB</td></tr>
+    <tr><th>とくいわざ</th><td>AI向け拡張命令（PIE）、MIPI カメラ・ディスプレイ、H.264 エンコーダ</td></tr>
+    <tr><th>通信</th><td>Tab5 では ESP32-C6 が Wi-Fi 6 を担当</td></tr>
+    <tr><th>AIの道具</th><td>ESP-DL、自分で書いた PIE 命令のカーネル</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>メモリの大きさに注目してください。PSRAM が 32MB。2章で見たふつうのマイコン（数百KB）とは、ケタが2つもちがいます。<strong>「マイコンには大きすぎる」はずのモデルが入ってしまう</strong>、それが ESP32-P4 のおもしろさです。</p>
+
+<h2>実例：マイコンで顔の画像を生成する（pico-faces-tab5）</h2>
+
+<p>画像生成AIといえば、GPU をぶん回して動かすもの……というイメージがありますよね。この作品では、それを Tab5 の上だけで動かしています。</p>
+
+<h3>もとになったモデル：pico-faces</h3>
+<p>cpldcpu さんが公開している <b>pico-faces</b> は、128×128 ピクセルの顔画像を作る、とても小さな画像生成AIです。</p>
+<ul>
+  <li>しくみ：<b>拡散モデル</b>（ノイズから少しずつ絵を浮かび上がらせる方式）。心臓部は約240万パラメータの Transformer（DiT）</li>
+  <li>重みも計算も<b>ぜんぶ int8</b>。推論エンジンは素の C言語（C99）で書かれている</li>
+  <li>「男性／女性」×「笑顔／真顔」を指定して生成できる</li>
+  <li>同じ種（シード）からは、PCでもマイコンでもビット単位でまったく同じ顔が出る</li>
+</ul>
+
+<h3>やったこと：PIE 命令で5倍速く</h3>
+<p>もとのエンジンをそのまま ESP-IDF に移植すると、1枚作るのに約6〜10秒かかりました。そこで、ESP32-P4 の <b>PIE（AI向けの拡張命令）</b>を使って、重い計算の部分を書き直しました。</p>
+
+<ul>
+  <li>int8 の掛け算・足し算を、<b>1命令で16個まとめて</b>計算する</li>
+  <li>よく使う重みを、PSRAM から速い内蔵 SRAM（200KB ぶん）に先回りして運んでおく</li>
+  <li>起動のたびに、PIE 版の計算結果がふつうの計算と一致するかを自動でチェックする（約0.1秒）</li>
+</ul>
+
+<p>もとのプログラムには手を入れず、リンカーの機能で「重い関数だけ差し替える」やり方をとっているのも、移植をきれいに保つためのうまい工夫です。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>設定（標準モデル）</th><th>ふつうのCで</th><th>PIE 命令で</th><th>速くなった倍率</th></tr></thead>
+  <tbody>
+    <tr><td>4ステップ、ガイダンスなし</td><td class="num">5.99 秒</td><td class="num"><b>1.27 秒</b></td><td class="num">4.7倍</td></tr>
+    <tr><td>4ステップ、ガイダンスあり</td><td class="num">10.11 秒</td><td class="num"><b>2.02 秒</b></td><td class="num">5.0倍</td></tr>
+    <tr><td>8ステップ、ガイダンスなし</td><td class="num">10.09 秒</td><td class="num"><b>2.03 秒</b></td><td class="num">5.0倍</td></tr>
+    <tr><td>8ステップ、ガイダンスあり</td><td class="num">18.30 秒</td><td class="num"><b>3.52 秒</b></td><td class="num">5.2倍</td></tr>
+  </tbody>
+</table>
+</div>
+<p style="font-size:14px;color:var(--muted)">Tab5（ESP32-P4、360MHz）での実測値。2026年9月6日計測。</p>
+
+<p>比べるために ESP32-S3（CoreS3）でも同じことを試すと、S3 のベクトル命令を使っても1枚6.9秒（使わないと27.9秒）。P4 はクロックの速さ、メモリの大きさ、命令の強さの3つがそろって、S3 の約3倍の速さを出しています。</p>
+
+<h3>メモリの使い方をのぞいてみる</h3>
+<ul>
+  <li>Flash：アプリ全体で 5.28MB（そのうちモデルが 4.02MB）</li>
+  <li>内蔵 SRAM：生成中も最低 149KB は空いている</li>
+  <li>PSRAM：32MB のうち約 10.6MB を使用</li>
+</ul>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道</span>
+  <p>1枚2秒の時間のうち、約1.5秒が Transformer（DiT）、約0.5秒が画像に戻す VAE デコーダです。さらに細かく測ると、全結合層（MLP）が0.6秒、注意機構（attention）が0.26秒……と、どこが重いかがはっきり見えてきます。<strong>速くしたければ、まず測る</strong>。3章のヒントの実践例ですね。</p>
+</div>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/pico-faces-tab5">airpocket-soundman/pico-faces-tab5</a></p>
+
+<h2>Tab5 でほかに作ったもの</h2>
+
+<ul>
+  <li><b>Tab5_synth</b>：大画面とマイクを使ったシンセサイザー（<a href="https://github.com/airpocket-soundman/Tab5_synth">Tab5_synth</a>）。</li>
+  <li><b>M5Tab-logic-analyzer</b>：8チャンネルのロジックアナライザ。UART・I2C・SPI の中身まで読める（<a href="https://github.com/airpocket-soundman/M5Tab-logic-analyzer">M5Tab-logic-analyzer</a>）。</li>
+  <li><b>Tab5_SSH_Client</b>：キーボードをつないで、持ち歩ける SSH 端末に（<a href="https://github.com/airpocket-soundman/Tab5_SSH_Client">Tab5_SSH_Client</a>）。</li>
+  <li><b>IPB2000_2_3data_indicator</b>：工場の機械のデータを大画面に表示するインジケーター（<a href="https://github.com/airpocket-soundman/IPB2000_2_3data_indicator">IPB2000_2_3data_indicator</a>）。</li>
+</ul>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>Tab5 を持っていたら、pico-faces-tab5 を書き込んで、シードを変えながら顔を作ってみましょう。同じシードなら毎回同じ顔が出るので、「お気に入りの顔の番号」を探すのも楽しいですよ。</p>
+</div>

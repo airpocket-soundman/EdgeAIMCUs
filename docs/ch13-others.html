@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>13章 まだまだいる！ほかのマイコンたち｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html" class="current"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第13章</span>
+  <h1>まだまだいる！ほかのマイコンたち</h1>
+  <p class="chapter-lead">第2部の最後は、作者の作品に登場した個性ゆたかなマイコンたちを、駆け足で紹介します。</p>
+</div>
+
+<h2>Kendryte K210（Sipeed Maix Bit、M5StickV）</h2>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>コア</th><td>RISC-V 64bit ×2、400MHz</td></tr>
+    <tr><th>SRAM</th><td>8MB（うち 2MB は AI 用）</td></tr>
+    <tr><th>AIの助っ人</th><td><b>KPU</b>（畳み込みニューラルネットワーク専用のアクセラレータ）、マイクアレイ用の音声処理回路</td></tr>
+    <tr><th>開発環境</th><td>MaixPy（MicroPython）、Kendryte SDK</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>K210 は、「マイコンでカメラAI」がまだ珍しかったころに登場して、多くのメイカーを驚かせたチップです。SRAM が 8MB もあり、KPU で顔検出や物体検出がサクサク動きました。</p>
+
+<p>作者は、K210 の<strong>マイクアレイ用の回路</strong>に注目しました。6＋1個のマイクを並べたボードをつなぐと、音がどの方向から来ているかをチップが計算してくれます。これを使って作ったのが、</p>
+
+<ul>
+  <li><b>SoundVisualizer</b>：カメラの映像に「音の出どころ」を色で重ねて表示する、持ち運べるサウンドカメラ（<a href="https://github.com/airpocket-soundman/SoundVisualizer">SoundVisualizer</a>）。</li>
+  <li><b>SoundCamera</b>：同じしくみで、パソコン用のサウンドカメラにしたもの（<a href="https://github.com/airpocket-soundman/SoundCamera">SoundCamera</a>）。</li>
+</ul>
+
+<p>どちらもニューラルネットワークは使っていませんが、「音の方向がわかる」ことは、音のAIの前処理としてとても強力です。「どこから鳴ったか」と「何の音か」を組み合わせたら……と想像すると、ワクワクしてきませんか？</p>
+
+<p>M5StickV（K210 搭載）は、サーボで文字を表示する <b>mechanical_display</b>（<a href="https://github.com/airpocket-soundman/mechanical_display">mechanical_display</a>）の司令塔としても活躍しました。</p>
+
+<h2>ESP32（初代）：M5Stack の定番</h2>
+
+<p>5章の ESP32-S3 の先輩です。M5Stack Core / Core2、M5StickC Plus、ATOM Matrix など、たくさんのボードに載っていて、作者の作品にも一番たくさん登場します。</p>
+
+<ul>
+  <li>Xtensa LX6 ×2、240MHz、SRAM 520KB</li>
+  <li>S3 のようなAI向けのベクトル命令はないものの、小さな分類モデルなら十分に動きます</li>
+  <li>UIFlow（ブロック）でも作れるので、ワークショップにも便利（<a href="https://github.com/airpocket-soundman/M5ColorFinderWS">M5ColorFinderWS</a>）</li>
+</ul>
+
+<p>作品の例：スマートスケール（<a href="https://github.com/airpocket-soundman/M5StackSmartScale">M5StackSmartScale</a>）、ストロボスコープの表示側（<a href="https://github.com/airpocket-soundman/Stroboscope">Stroboscope</a>）、スタックチャンの練習（<a href="https://github.com/airpocket-soundman/stackchan_try">stackchan_try</a>）、ATOM Matrix のクリスマスツリー（<a href="https://github.com/airpocket-soundman/AtomMatrixTree">AtomMatrixTree</a>）、FPVカー（<a href="https://github.com/airpocket-soundman/RoverC_FPVCar">RoverC_FPVCar</a>）など。センサーの値を集めてパソコンやサーバーに送る役としても、仕事の現場で活躍しています。</p>
+
+<h2>Renesas RA4M1（Arduino UNO R4）</h2>
+
+<ul>
+  <li>Cortex-M4F、48MHz、SRAM 32KB、Flash 256KB</li>
+  <li>Arduino UNO の第4世代。おなじみの形のまま、中身が 32ビットの Cortex-M4 になりました</li>
+</ul>
+
+<p>作者はストロボスコープで、フラッシュを光らせるタイミングの係に使っています（<a href="https://github.com/airpocket-soundman/M5Stack_Stroboscope">M5Stack_Stroboscope</a>）。SRAM 32KB は AIにはちょっと小さめですが、DSP命令を持つ Cortex-M4F なので、加速度の簡単な分類くらいなら挑戦できます。</p>
+
+<h2>マイコンのその先：Axera AX630C（M5Stack Module LLM）</h2>
+
+<p>4章の最後で紹介した <b>AI SoC</b> の代表です。M5Stack の <b>Module LLM</b> に載っていて、小さな言語モデル（LLM）や音声認識、物体検出を手のひらサイズで動かせます。</p>
+
+<p>作者は、M5StickC Plus2 などの ESP32 ボードから UART で Module LLM に話しかける実験をしています（<a href="https://github.com/airpocket-soundman/M5Stack_LLM">M5Stack_LLM</a>）。<strong>マイコンが「窓口」、AI SoC が「頭脳」</strong>という組み合わせは、マイコン単体では届かない大きなAIを、マイコンの作品に取り入れる近道です。</p>
+
+<h2>Raspberry Pi（Linux のシングルボードコンピュータ）</h2>
+
+<p>マイコンではありませんが、ひとつ上のクラスのエッジAIとして、Raspberry Pi も作者の作品にたくさん登場します。古い8mmフィルムカメラをデジタル化する一連の作品（<a href="https://github.com/airpocket-soundman/yashica8">yashica8</a>、<a href="https://github.com/airpocket-soundman/retrofit-8mm-movie-camera-V2">retrofit-8mm-movie-camera-V2</a> ほか）では、Raspberry Pi Zero 2 W がカメラの心臓部です。</p>
+
+<p>Raspberry Pi Zero 2 W でも、YOLOX のような物体検出モデルを動かせます。「マイコンでは足りないけど、GPU までは要らない」。そんなときの頼れる選択肢です。</p>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>ここまで読んで気になったマイコンはありましたか？ 付録Aに、作者のリポジトリに登場したマイコンをまとめました。次に遊ぶ1枚を選ぶ参考にしてください。</p>
+</div>
+
+<nav class="pager"><a class="prev" href="ch12-rp2040.html"><small>← まえへ</small>12章 RP2040 / RP2350（Raspberry Pi Pico）</a><a class="next" href="appendix-candidates.html"><small>つぎへ →</small>付録A 作者のリポジトリに登場したマイコン一覧</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>8章 ROHM Solist-AI（ML63Q2557）｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html" class="current"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第8章</span>
+  <h1>ROHM Solist-AI（ML63Q2557）</h1>
+  <p class="chapter-lead">SRAM はたったの16KB。なのにAIが動いて、しかもその場で学習までできる。小さな巨人のお話です。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>Solist-AI（ソリストAI）</b>は、日本の半導体メーカー ROHM（ローム）が作った、AI用のアクセラレータを内蔵したマイコンのシリーズです。この章で使う <b>ML63Q2557</b> には、<b>AxlCORE-ODL</b> というAI回路が載っています。評価ボードは <b>DT-EBML63Q2557</b>。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>ROHM ML63Q2557</td></tr>
+    <tr><th>コア</th><td>Arm Cortex-M0+、48MHz</td></tr>
+    <tr><th>SRAM</th><td><b>16KB</b></td></tr>
+    <tr><th>Flash</th><td>256KB</td></tr>
+    <tr><th>AIの助っ人</th><td><b>AxlCORE-ODL</b>（bfloat16 で計算する、推論と学習のためのアクセラレータ）</td></tr>
+    <tr><th>AIの道具</th><td>ROHM の Solist-AI ライブラリ、PC用シミュレータ「Solist-AI Sim」</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>「その場で学習」ができるマイコン</h3>
+
+<p>3章で「学習はパソコン、推論はマイコン」と説明しました。ところが Solist-AI は、<strong>マイコンの上で学習までできてしまう</strong>のが売りです。これを <b>オンデバイス学習（ODL：On-Device Learning）</b>と呼びます。</p>
+
+<p>そのしくみは、<b>ELM（Extreme Learning Machine）</b>という、ちょっと変わったニューラルネットワークです。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 620 200" role="img" aria-label="ELMのしくみ">
+      <g font-size="13" text-anchor="middle">
+        <rect x="10" y="50" width="120" height="100" rx="14" class="surface"/><text x="70" y="95">入力</text><text x="70" y="115" class="muted" font-size="12">センサーの特徴</text>
+        <rect x="250" y="50" width="120" height="100" rx="14" class="teal-soft"/><text x="310" y="95">隠れ層</text><text x="310" y="115" class="muted" font-size="12">32個</text>
+        <rect x="490" y="50" width="120" height="100" rx="14" class="surface"/><text x="550" y="95">出力</text><text x="550" y="115" class="muted" font-size="12">答え（クラス）</text>
+        <text x="190" y="40" font-weight="800">α：ランダムで固定</text>
+        <text x="190" y="175" class="muted" font-size="12">学習しない！</text>
+        <text x="430" y="40" font-weight="800" class="accent">β：ここだけ学習</text>
+        <text x="430" y="175" class="muted" font-size="12">計算がとても軽い</text>
+      </g>
+      <line x1="135" y1="100" x2="245" y2="100" class="stroke" stroke-width="2" stroke-dasharray="6 5"/>
+      <line x1="375" y1="100" x2="485" y2="100" class="stroke" stroke-width="3"/>
+      <polygon points="485,94 497,100 485,106" class="accent"/>
+      <polygon points="245,94 257,100 245,106" class="accent"/>
+    </svg>
+  </div>
+  <figcaption>図8-1 ELM のしくみ。前半の重み α はランダムに決めて固定し、後半の β だけを学習します。</figcaption>
+</figure>
+
+<p>ふつうのニューラルネットワークは、全部の重みを少しずつ何千回も調整して学習します。ELM は、前半の重み（α）を<strong>サイコロを振って決めたら、もう動かさない</strong>。後半の重み（β）だけを、一発の計算で決めてしまいます。学習がとても軽いので、小さなマイコンの上でもできる、というわけです。</p>
+
+<p>おまけに、α は「サイコロの種」さえ決めておけばチップの中で毎回同じものを作り直せるので、<strong>メモリに保存しておく必要すらありません</strong>。16KB の世界では、これがとても効いてきます。</p>
+
+<h2>実例1：アクリル板を楽器にする（acrylic_pan）</h2>
+
+<p>400×300mm のアクリル板をたたくと、<strong>どこをたたいたかをAIが当てて</strong>、場所ごとにちがう音を鳴らす。スチールドラムのような電子楽器です。センサーは、板に貼った加速度センサー（KX134）<b>たった1つ</b>だけ。</p>
+
+<h3>しくみ</h3>
+<ol>
+  <li>加速度センサーを 1秒に25,600回 読み続け、たたいた瞬間を見つけたら 512サンプル（20ミリ秒ぶん）を切り出す。</li>
+  <li>たたいた瞬間の位置をそろえ、ローパスフィルタ、間引き、窓関数をかけてから <b>FFT</b>。</li>
+  <li>周波数の成分を 128個にまとめて、Solist-AI の ELM（入力128 → 隠れ32 → 出力12）に入れる。</li>
+  <li>板を 4×3 の <b>12エリア</b>に分けて、どのエリアをたたいたかを当てる。</li>
+</ol>
+
+<p>同じ板でも、たたく場所によって振動の「響き方」が変わる。IchiPing（7章）が部屋の響きを聞いていたのと同じ発想を、今度は板でやっているんですね。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>結果</th></tr></thead>
+  <tbody>
+    <tr><td>12エリアの判定（最新モデル、評価用データ 1,426回）</td><td><b>89.1%</b>（以前のモデルは67.1%）</td></tr>
+    <tr><td>60地点の判定（Solist-AI 上のモデル）</td><td>1位正解率 <b>97.3%</b>、位置の平均誤差 5.55mm</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>データを 11回に分けて合計 7,132回たたいて集めたことで、12エリアの正解率が 67% から 89% まで上がりました。ここでも効いたのは<strong>データの量と多様さ</strong>です。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan">airpocket-soundman/acrylic_pan</a></p>
+
+<h2>実例2：IchiPing を 16KB に押し込む（IchiPing_solist_AI）</h2>
+
+<p>7章の IchiPing（音で窓の開け閉めを当てる）を、Solist-AI に引っ越しさせたプロジェクトです。</p>
+
+<p>もとの IchiPing は、MCX N947 の NPU で約10万パラメータの CNN を動かしていました。これを SRAM 16KB のマイコンにそのまま入れるのは無理。そこで、</p>
+
+<ul>
+  <li>音の特徴を、400〜3000Hz の範囲に絞った <b>167個</b>の数値に小さくする</li>
+  <li>モデルを CNN から <b>ELM</b>（入力167 → 隠れ32）に置きかえる</li>
+  <li>スピーカーとマイクの係は、相棒の <b>M5Stamp S3A（ESP32-S3）</b>にまかせる</li>
+</ul>
+
+<p>という作戦をとりました。学習するパラメータの数は、もとの CNN の<strong>約51分の1</strong>。AIが使うメモリは約11KB で、16KB の中にちゃんと収まります。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>設定</th><th>1回ごとの正解率</th><th>多数決での正解率</th></tr></thead>
+  <tbody>
+    <tr><td>14グループ（工場出荷のまま、現地での学習なし）</td><td class="num">99.4%</td><td class="num"><b>100%</b></td></tr>
+    <tr><td>32状態（現地で各状態10回ぶんを追加して学習）</td><td class="num">99.1%</td><td class="num"><b>100%</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p style="font-size:14px;color:var(--muted)">ROHM 公式の Solist-AI Sim（SLV1.00.04）での評価。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：本当は「その場で学習」したかった</span>
+  <p>実はこのプロジェクト、最初はチップの上での学習（ODL）を使うつもりでした。ところが試してみると学習が安定しなかったため、β の学習だけはパソコンでまとめて計算して、チップに書き込む方式に切りかえています。ELM は β の計算が軽いので、「どこで学習するか」を後から選び直せるのも強みです。<strong>うまくいかないときは、作戦を変えればいい</strong>。これもエッジAIの楽しみ方です。</p>
+</div>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/IchiPing_solist_AI">airpocket-soundman/IchiPing_solist_AI</a></p>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>acrylic_pan：最新モデルでの実機の推論時間を測りなおして追記する（初期の参考値は、推論とソフトマックスを合わせて約35ミリ秒）。</li>
+    <li>IchiPing_solist_AI：実機での正解率が出たら追記する。</li>
+  </ul>
+</div>
+
+<nav class="pager"><a class="prev" href="ch07-mcxn947.html"><small>← まえへ</small>7章 NXP MCX N947（FRDM-MCXN947）</a><a class="next" href="ch09-spresense.html"><small>つぎへ →</small>9章 Sony Spresense（CXD5602）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

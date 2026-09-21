@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>7章 NXP MCX N947（FRDM-MCXN947）｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html" class="current"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第7章</span>
+  <h1>NXP MCX N947（FRDM-MCXN947）</h1>
+  <p class="chapter-lead">AI専用エンジン「NPU」を積んだマイコン。推論にかかる時間は、なんと 2ミリ秒以下です。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>MCX N947</b> は、オランダの半導体メーカー NXP のマイコンです。Cortex-M33 を2つ積んだうえに、<strong>eIQ Neutron NPU</strong> というAI計算の専用回路を内蔵しています。4章でいう「グループC：NPU内蔵タイプ」の代表選手です。</p>
+
+<p>この MCX N947 を気軽に試せるように作られた評価ボードが <b>FRDM-MCXN947</b>。数千円で手に入り、Arduino 互換のピン配置もあるので、センサーのシールドもつなげます。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>NXP MCX N947</td></tr>
+    <tr><th>コア</th><td>Arm Cortex-M33 ×2、150MHz</td></tr>
+    <tr><th>SRAM</th><td>512KB</td></tr>
+    <tr><th>Flash</th><td>2MB</td></tr>
+    <tr><th>AIの助っ人</th><td><b>eIQ Neutron NPU</b>、PowerQuad（FFTなどの信号処理を速くする回路）</td></tr>
+    <tr><th>とくいわざ</th><td>I2S をいくつも使える、カメラ入力、Ethernet、USB</td></tr>
+    <tr><th>開発環境</th><td>MCUXpresso（VS Code 拡張・IDE）、MCUXpresso SDK、Zephyr</td></tr>
+    <tr><th>AIの道具</th><td><b>eIQ</b>（モデル変換ツール Neutron Converter、TensorFlow Lite for Microcontrollers ＋ Neutron 用ドライバ）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>実例：音で「どの窓が開いているか」を当てる（IchiPing）</h2>
+
+<p>外出先で「あれ、窓閉めたっけ？」と不安になったこと、ありませんか？ <b>IchiPing（いちピン）</b>は、それを<strong>マイク1つとスピーカー1つだけで</strong>当ててしまおうという作品です。</p>
+
+<h3>しくみ：部屋の「響き」を聞く</h3>
+
+<p>部屋でパンと手をたたくと、壁や窓にはね返った音が響きますよね。この響き方は、窓が開いているか閉まっているかで少しずつ変わります。IchiPing は、この変化をAIに聞き分けさせます。</p>
+
+<ol>
+  <li>スピーカーから、低い音から高い音へスーッと上がっていく音（<b>チャープ</b>、200Hz → 8kHz、0.3秒）や、ザーッというノイズを出します。</li>
+  <li>それをマイク（INMP441）で録音して、部屋の響きの特徴（<b>インパルス応答</b>）を取り出します。</li>
+  <li>響きを <b>FFT</b> で周波数ごとの強さにして、1024個の数値にまとめます。</li>
+  <li>これを小さな<b>畳み込みニューラルネットワーク（CNN）</b>に入れて、5つの窓・ドアの開け閉めの組み合わせを当てます。</li>
+</ol>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 660 150" role="img" aria-label="IchiPingの処理の流れ">
+      <g font-size="13" text-anchor="middle">
+        <rect x="5" y="40" width="110" height="60" rx="12" class="surface"/><text x="60" y="66">🔊 チャープ音</text><text x="60" y="85">を鳴らす</text>
+        <rect x="140" y="40" width="110" height="60" rx="12" class="surface"/><text x="195" y="66">🎤 響きを</text><text x="195" y="85">録音</text>
+        <rect x="275" y="40" width="110" height="60" rx="12" class="teal-soft"/><text x="330" y="66">FFT で</text><text x="330" y="85">1024個の数値に</text>
+        <rect x="410" y="40" width="110" height="60" rx="12" class="accent"/><text x="465" y="66" class="on-accent" font-weight="800">NPU で CNN</text><text x="465" y="85" class="on-accent">1.89ms</text>
+        <rect x="545" y="40" width="110" height="60" rx="12" class="surface"/><text x="600" y="66">🪟 開いている</text><text x="600" y="85">窓を表示</text>
+      </g>
+      <polygon points="119,64 131,70 119,76" class="accent"/>
+      <polygon points="254,64 266,70 254,76" class="accent"/>
+      <polygon points="389,64 401,70 389,76" class="accent"/>
+      <polygon points="524,64 536,70 524,76" class="accent"/>
+      <text x="330" y="130" font-size="12" text-anchor="middle" class="muted">5つの窓・ドアの開閉 = 2⁵ = 32通りの状態を見分ける</text>
+    </svg>
+  </div>
+  <figcaption>図7-1 IchiPing の処理の流れ。</figcaption>
+</figure>
+
+<h3>MCX N947 への載せ方</h3>
+
+<p>パソコンで学習したモデルを、NPU で動く形にするまでの道のりはこうです。</p>
+
+<pre><code>PyTorch で学習
+  ↓ ONNX（float32）に書き出し
+  ↓ onnx2tf で TensorFlow Lite（int8）に変換・量子化（代表データ 200 フレーム）
+  ↓ NXP の Neutron Converter で「NPU 用」に変換
+  ↓ C の配列（model_data.h）にしてファームウェアに埋め込む
+MCX N947 の NPU で推論！</code></pre>
+
+<p>ポイントは、モデルの<strong>すべての演算（7個中7個）を NPU で動かせた</strong>ことです。NPU が苦手な演算が混ざると、そこだけ CPU で計算することになり、速さがぐっと落ちてしまいます。モデルを設計するときから「NPU が得意な形」を意識しておくのがコツです。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>値</th></tr></thead>
+  <tbody>
+    <tr><td>モデル</td><td>畳み込み3層＋出力層。32状態用と14状態用の2つの出力を持つ</td></tr>
+    <tr><td>パラメータ数</td><td>約10万4千</td></tr>
+    <tr><td>モデルの大きさ（int8）</td><td>約108KB</td></tr>
+    <tr><td>NPU で動いた演算</td><td>7 / 7（100%）</td></tr>
+    <tr><td><b>推論時間</b></td><td><b>1.89ミリ秒</b></td></tr>
+    <tr><td>正解率（実機）</td><td>32状態・14状態とも <b>100%</b>（その場のデータを足して学習したモデル）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>100%までの道のり</h3>
+
+<p>最初からうまくいったわけではありません。32状態の正解率は、<b>59% → 88% → 100%</b> と、少しずつ上がっていきました。効いたのは、</p>
+
+<ul>
+  <li>本番の部屋で録ったデータを学習に足す</li>
+  <li>「基準の響き」を少しずらしたデータを作って水増しする（データ拡張）</li>
+  <li>テレビやエアコンの音がする中でもデータを録る</li>
+</ul>
+
+<p>といった、<strong>データ側の工夫</strong>でした。モデルを大きくするより、データを本番に近づけるほうがずっと効く。3章で「データ集めがいちばん大事」と書いたのは、こういうことなんです。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：「聞き分けられない」はずが……</span>
+  <p>最初は「窓の組み合わせによっては響きがほとんど同じで、32通りのうち14グループまでしか見分けられないだろう」と考えていました。ところが実際には、閉まった窓やドアからも音が少しずつもれていて、その差（−20〜−30dB）をAIがちゃんと拾い、32通りすべてを見分けられることがわかりました。<strong>やってみたら、AIのほうが耳がよかった</strong>。こういう発見があるから、エッジAIはやめられません。</p>
+</div>
+
+<p>IchiPing はこのあと、Arduino UNO Q（10章）や ROHM Solist-AI（8章）にも移植されています。同じアイデアを、性格のちがうマイコンでどう実現するか。章をまたいで読み比べてみてください。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/IchiPing">airpocket-soundman/IchiPing</a></p>
+
+<h2>FRDM-MCXN947 の練習帳</h2>
+
+<p>MCUXpresso SDK のサンプルを動かして、改造しながら覚えていくための練習用リポジトリもあります。初めて NXP のマイコンを触るときの参考にどうぞ。</p>
+<ul>
+  <li><a href="https://github.com/airpocket-soundman/FRDM-MCXN947_demo">FRDM-MCXN947_demo</a></li>
+  <li><a href="https://github.com/airpocket-soundman/FRDM-MCXN947_test">FRDM-MCXN947_test</a></li>
+</ul>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>同じモデルを NPU なし（CPU のみ）で動かしたときの推論時間を測って、NPU の効果を比べる表を足す。</li>
+    <li>テンソルアリーナ（作業用メモリ）の使用量を追記する。</li>
+  </ul>
+</div>
+
+<nav class="pager"><a class="prev" href="ch06-esp32p4.html"><small>← まえへ</small>6章 ESP32-P4（M5Stack Tab5）</a><a class="next" href="ch08-solist-ai.html"><small>つぎへ →</small>8章 ROHM Solist-AI（ML63Q2557）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

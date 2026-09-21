@@ -1,0 +1,68 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第12章</span>
+  <h1>RP2040 / RP2350（Raspberry Pi Pico）</h1>
+  <p class="chapter-lead">数百円で買える、Raspberry Pi 財団のマイコン。すなおな性格で、AIの中身を学ぶ相棒にぴったりです。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p>Raspberry Pi といえば Linux が動く小さなコンピュータが有名ですが、同じ Raspberry Pi 財団は、自前のマイコンも作っています。それが <b>RP2040</b> と、その後継の <b>RP2350</b>。これらを載せたボードが <b>Raspberry Pi Pico</b> と <b>Pico 2</b> です。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>RP2040（Pico）</th><th>RP2350（Pico 2）</th></tr></thead>
+  <tbody>
+    <tr><th>コア</th><td>Cortex-M0+ ×2、133MHz</td><td>Cortex-M33 ×2、150MHz（RISC-V コア Hazard3 ×2 に切りかえ可）</td></tr>
+    <tr><th>SRAM</th><td>264KB</td><td>520KB</td></tr>
+    <tr><th>Flash</th><td>ボード上に 2MB</td><td>ボード上に 4MB</td></tr>
+    <tr><th>とくいわざ</th><td colspan="2"><b>PIO</b>（自由にプログラムできる入出力回路）、安さ、情報の多さ</td></tr>
+    <tr><th>開発環境</th><td colspan="2">Pico SDK（C/C++）、Arduino、MicroPython、CircuitPython</td></tr>
+    <tr><th>AIの道具</th><td colspan="2">TensorFlow Lite for Microcontrollers、Edge Impulse、手書きのC</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>RP2040 と RP2350 のちがいは「AIの力」</h3>
+<p>RP2040 の Cortex-M0+ は、とても小さくて省エネなコアですが、積和演算をまとめてこなす命令を持っていません。一方、RP2350 の Cortex-M33 は <b>DSP命令</b>と浮動小数点ユニットを持っています。4章のグループでいうと、RP2040 は「A：すなおなCPUタイプ」、RP2350 は「B：DSP命令でがんばるタイプ」。AIで遊ぶなら、<strong>RP2350 がおすすめ</strong>です。</p>
+
+<h3>PIO はセンサー集めの名人</h3>
+<p><b>PIO</b> は、ピンの ON/OFF を超正確なタイミングで操る小さな専用プロセッサです。ほかのマイコンでは専用の回路が必要な、I2S のマイクやちょっと変わったセンサーでも、PIO なら自分で「つなぎ方」をプログラムできます。AIに食べさせるデータを集める係として、とても頼りになります。</p>
+
+<h2>RP2350 で画像生成AI？</h2>
+
+<p>6章で紹介した、顔の画像を作る小さなAI <b>pico-faces</b>。実はもともと、<strong>Raspberry Pi Pico 2（RP2350）で動かすために作られた</strong>ものです。名前の「pico」はここから来ています。</p>
+
+<p>同じ設定（4ステップ、ガイダンスあり）で1枚作る時間を比べると、こんな感じです。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>マイコン</th><th>1枚あたりの時間</th></tr></thead>
+  <tbody>
+    <tr><td>RP2350（300MHz）</td><td class="num">約 10 秒</td></tr>
+    <tr><td>ESP32-S3（ベクトル命令あり）</td><td class="num">約 6.9 秒</td></tr>
+    <tr><td>ESP32-P4（PIE 命令あり、360MHz）</td><td class="num"><b>約 2.0 秒</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p style="font-size:14px;color:var(--muted)">RP2350 の値は上流の pico-faces の公表値（オーバークロックして300MHz動作）。ESP32 の2つは pico-faces-tab5 での実測値。</p>
+
+<p>数百円のマイコンが、10秒で顔の絵を1枚描く。速さでは ESP32-P4 にかないませんが、<strong>「この値段のチップでここまでできる」</strong>という驚きは RP2350 がいちばんかもしれません。</p>
+
+<h2>RP2040 で作ったもの</h2>
+
+<ul>
+  <li><b>Raspberry-Pi-Pico-Hapstack-Bridge</b>：パソコンからは USB スピーカーに見えて、受け取った音を I2S で HapStak（振動で音を感じるデバイス）に送る「橋渡し」ファームウェア。TinyUSB と PIO を使っています（<a href="https://github.com/airpocket-soundman/Raspberry-Pi-Pico-Hapstack-Bridge">Raspberry-Pi-Pico-Hapstack-Bridge</a>）。音声を途切れなく受け渡す技術は、そのまま音のAIのデータ集めに使えます。</li>
+</ul>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>Pico 2 を持っていたら、上流の pico-faces を書き込んで、顔が浮かび上がってくるまでの10秒をじっくり眺めてみてください。ノイズから少しずつ顔が現れるようすは、画像生成AIのしくみそのものです。</p>
+</div>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>RP2350 で TFLite Micro か手書きCの分類モデル（音か加速度）を動かす実例を作って追加する。</li>
+    <li>RP2040 と RP2350 で同じモデルの推論時間を比べ、DSP命令の効果を見せる。</li>
+  </ul>
+</div>

@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>9章 Sony Spresense（CXD5602）｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html" class="current"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第9章</span>
+  <h1>Sony Spresense（CXD5602）</h1>
+  <p class="chapter-lead">コアが6つもある、ちょっと変わり者の高性能マイコン。ソニー純正のAIツールと組み合わせると、マウス操作だけでAIが作れます。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>Spresense（スプレッセンス）</b>は、ソニーが作ったマイコンボードです。心臓部の <b>CXD5602</b> は、もともと GPS 付きの腕時計のような「省エネで、でもしっかり計算したい機器」のために作られたチップ。そのせいか、ほかのマイコンにはない個性がいっぱい詰まっています。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>Sony CXD5602</td></tr>
+    <tr><th>コア</th><td>Arm Cortex-M4F（浮動小数点ユニット付き）<b>×6</b>、156MHz</td></tr>
+    <tr><th>SRAM</th><td>1.5MB</td></tr>
+    <tr><th>Flash</th><td>8MB（メインボード上）</td></tr>
+    <tr><th>とくいわざ</th><td>GPS（GNSS）内蔵、ハイレゾ音声の入出力、マルチマイク、専用カメラボード</td></tr>
+    <tr><th>開発環境</th><td>Arduino IDE、Spresense SDK（NuttX ベース）</td></tr>
+    <tr><th>AIの道具</th><td>Neural Network Console（NNC）＋ DNNRT ライブラリ、TensorFlow Lite for Microcontrollers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>コアが6つあると、なにがうれしい？</h3>
+<p>1つのコアでセンサーを読み続けながら、別のコアでAIの計算をする、といった分業ができます。音や振動のように「データが途切れなく流れてくる」ものをAIで見張るのに向いています。</p>
+
+<h3>Neural Network Console でAIをつくる</h3>
+<p>Spresense ならではの楽しさが、ソニーの <b>Neural Network Console（NNC）</b>との組み合わせです。NNC は、ブロックを線でつなぐようにしてニューラルネットワークを組み立て、そのまま学習までできるアプリ。学習したモデルを <b>nnb</b> という形式で書き出して、Spresense の <b>DNNRT</b> ライブラリで読み込めば、もう推論ができてしまいます。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 660 120" role="img" aria-label="NNCからSpresenseへの流れ">
+      <g font-size="13" text-anchor="middle">
+        <rect x="5" y="30" width="140" height="60" rx="12" class="surface"/><text x="75" y="56">Spresense で</text><text x="75" y="75">データを録る</text>
+        <rect x="175" y="30" width="140" height="60" rx="12" class="violet-soft"/><text x="245" y="56">NNC で</text><text x="245" y="75">組み立て＆学習</text>
+        <rect x="345" y="30" width="140" height="60" rx="12" class="surface"/><text x="415" y="56">model.nnb を</text><text x="415" y="75">SDカードへ</text>
+        <rect x="515" y="30" width="140" height="60" rx="12" class="accent"/><text x="585" y="56" class="on-accent" font-weight="800">DNNRT で</text><text x="585" y="75" class="on-accent" font-weight="800">推論！</text>
+      </g>
+      <polygon points="150,54 162,60 150,66" class="accent"/>
+      <polygon points="320,54 332,60 320,66" class="accent"/>
+      <polygon points="490,54 502,60 490,66" class="accent"/>
+    </svg>
+  </div>
+  <figcaption>図9-1 NNC と Spresense の連携。プログラムを書くのは、データを録るところと推論するところだけ。</figcaption>
+</figure>
+
+<p>Arduino のスケッチから見ると、推論の部分は驚くほど短くなります。</p>
+
+<pre><code>#include &lt;SDHCI.h&gt;
+#include &lt;DNNRT.h&gt;
+
+SDClass SD;
+DNNRT dnnrt;
+
+void setup() {
+  SD.begin();
+  File nnbFile = SD.open("model.nnb");   // NNC で書き出したモデル
+  dnnrt.begin(nnbFile);                  // これで準備完了
+}
+
+void loop() {
+  DNNVariable input(512);                // 入力の箱を用意して
+  float *data = input.data();
+  // ... data[] にセンサーの値（特徴量）を入れる ...
+  dnnrt.inputVariable(input, 0);
+  dnnrt.forward();                       // 推論！
+  DNNVariable output = dnnrt.outputVariable(0);
+  int answer = output.maxIndex();        // いちばん確からしい答え
+}</code></pre>
+
+<h2>実例1：卵の茹で加減を、割らずに当てる（egg-analyzer）</h2>
+
+<p>「この卵、ちゃんと温泉卵になってる？」。割ってみないとわからないことを、AIで当ててみよう、という作品です。</p>
+
+<h3>しくみ</h3>
+<ol>
+  <li>卵をホルダーにセットして、<b>ステッピングモーターで回します</b>。</li>
+  <li>そのときのモーターの<b>電流</b>を、M5Stack 用の電流計ユニットで測ります。中身の固まり具合によって、回るときの「手ごたえ」が変わるはず、というアイデアです。</li>
+  <li>電流を 2.5ミリ秒ごとに 1024回（約2.6秒ぶん）記録します。</li>
+  <li>記録した波形を <b>FFT</b>（高速フーリエ変換）で「どんな揺れ方がどれくらい含まれているか」に変換して、512個の数値にします。</li>
+  <li>この512個を、NNC で学習した小さなニューラルネットワークに入れて、茹で加減を<b>3つのクラス</b>に分けます。</li>
+</ol>
+
+<p>ネットワークは、512個の入力を100個のニューロンで受ける全結合（Affine）層を中心にした、とてもシンプルなもの。画像AIのような複雑なしかけはいりません。<strong>3章の「前処理でAIを楽にする」</strong>のお手本のような作品です。FFT で揺れ方を取り出してあげたおかげで、AIは「どの揺れが強いか」を見比べるだけで済んでいます。</p>
+
+<div class="box tip">
+  <span class="box-title">ここがポイント</span>
+  <p>このAIが見ているのは、カメラの画像でもマイクの音でもなく、<b>モーターの電流</b>です。「見た目ではわからないけど、何かの数値にはちがいが出ているかも」と考えると、エッジAIのネタはぐっと広がります。</p>
+</div>
+
+<p>ハードウェアは、Spresense メインボードと拡張ボード、2.2インチの液晶（ILI9341）、A4988 モータードライバ、NEMA17 ステッピングモーター、電流計ユニット、そして3Dプリンタで作ったケースと卵ホルダー。部品表とソースコードはリポジトリで公開しています。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/egg-analyzer">airpocket-soundman/egg-analyzer</a></p>
+
+<h2>実例2：振動のパターンを見分ける（MPU6886_spresense）</h2>
+
+<p>こちらは、加速度センサー（MPU6886）で拾った振動を、その場でAIに分類させる実験です。</p>
+
+<ul>
+  <li>約0.33ミリ秒ごと（1秒に約3,000回）に加速度を読みます。</li>
+  <li>縦方向の加速度が<b>しきい値を超えた瞬間</b>を「イベント」とみなして、そこから少しさかのぼったところ（50サンプル前）から、合計320サンプルを切り出します。</li>
+  <li>切り出した波形をそのまま NNC で学習したモデルに入れて、DNNRT で推論します。</li>
+</ul>
+
+<p>「ずっと推論し続ける」のではなく、「何か起きたときだけ推論する」。これは、電池で動かす機器でよく使う省エネの工夫です。さかのぼって記録しておくのは、イベントの<b>始まりの部分</b>を取りこぼさないため。小さなしかけですが、精度にしっかり効いてきます。</p>
+
+<p>データ集め用のスケッチ（<code>collect_vibration_data_02</code>）と、推論用のスケッチ（<code>inference_from_vibration_001</code>）が分かれているので、3章の「①データを集める → ⑤推論する」の流れがそのまま追えます。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/MPU6886_spresense">airpocket-soundman/MPU6886_spresense</a></p>
+
+<h2>ほかにも Spresense で作ったもの</h2>
+
+<ul>
+  <li><b>SORA-Q の改造</b>：月面探査ロボット SORA-Q のおもちゃ版に Spresense とカメラを載せたプロジェクト。NNC で25種類の画像を見分けるモデルを学習する実験もしています（<a href="https://github.com/airpocket-soundman/SORA-Q">SORA-Q</a>、<a href="https://github.com/airpocket-soundman/SPRESENSE-SORA-Q-challenge">SPRESENSE-SORA-Q-challenge</a>）。</li>
+  <li><b>シュリーレン撮影装置</b>：空気のゆらぎを見えるようにする撮影装置（<a href="https://github.com/airpocket-soundman/Schlieren_photography">Schlieren_photography</a>）。</li>
+  <li><b>二相界面の可視化</b>：ステッピングモーターで液体と気体の境目の動きを見せる作品（<a href="https://github.com/airpocket-soundman/Two-phase_interface">Two-phase_interface</a>）。</li>
+</ul>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>egg-analyzer：3クラスそれぞれの意味、正解率、推論時間を実機で確認して追記する。</li>
+    <li>MPU6886_spresense：分類している振動の種類と、正解率を追記する。</li>
+    <li>SORA-Q：25クラスのモデルを実機で動かしたかどうかを確認する。</li>
+  </ul>
+</div>
+
+<nav class="pager"><a class="prev" href="ch08-solist-ai.html"><small>← まえへ</small>8章 ROHM Solist-AI（ML63Q2557）</a><a class="next" href="ch10-uno-q.html"><small>つぎへ →</small>10章 Arduino UNO Q（STM32U585 ＋ QRB2210）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

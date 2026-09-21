@@ -1,0 +1,99 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第11章</span>
+  <h1>micro:bit（nRF52833）</h1>
+  <p class="chapter-lead">学校でもおなじみの小さなボード。実はAIのしくみを「手で」確かめるのに、うってつけなんです。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>micro:bit（マイクロビット）</b>は、イギリスで子どもたちのプログラミング教育のために生まれたボードです。日本でも多くの学校で使われています。いまの主流は <b>micro:bit V2</b> で、心臓部は Nordic の <b>nRF52833</b>。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>micro:bit V2</th><th>（参考）micro:bit V1</th></tr></thead>
+  <tbody>
+    <tr><th>チップ</th><td>Nordic nRF52833</td><td>Nordic nRF51822</td></tr>
+    <tr><th>コア</th><td>Cortex-M4F、64MHz</td><td>Cortex-M0、16MHz</td></tr>
+    <tr><th>RAM</th><td>128KB</td><td>16KB</td></tr>
+    <tr><th>Flash</th><td>512KB</td><td>256KB</td></tr>
+    <tr><th>ボードに載っているもの</th><td colspan="2">5×5 のLED、ボタン2つ、加速度・地磁気センサー、Bluetooth。V2 はさらにマイクとスピーカー、タッチセンサー</td></tr>
+    <tr><th>開発環境</th><td colspan="2">MakeCode（ブロック）、MicroPython、C/C++（CODAL）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>V2 には、<strong>マイクと加速度センサーがはじめから載っている</strong>のが大きなポイント。配線なしで「音」と「動き」のAIをすぐに試せます。</p>
+
+<div class="box tip">
+  <span class="box-title">ヒント</span>
+  <p>micro:bit 公式の <b>micro:bit CreateAI</b> を使うと、ブラウザの上で、micro:bit を振って動きのデータを集めて、学習させて、MakeCode のプログラムに組み込むまでができます。「最初の1個」をいちばん手軽に動かせる道具のひとつです。</p>
+</div>
+
+<h2>実例：背中に書いた数字を当てる（My_Dad-s_Back）</h2>
+
+<p>子どものころ、お父さんの背中に指で字を書いて「なんて書いたでしょう？」と当てっこしませんでしたか？ <b>My Dad's Back</b> は、その遊びをAIでやってみようという作品です。</p>
+
+<p>いまは試作の段階で、背中のかわりに <b>16×18 マスの小さなタッチパネル</b>を作り、そこに指で書いた数字（0〜9）を micro:bit V2 が当てます。</p>
+
+<h3>しくみ</h3>
+<ol>
+  <li>タッチパネルの 16×18 = <b>288マス</b>のどこが触られたかを読み取る。</li>
+  <li>触った線を太らせて（中心を255、上下左右を150に）、手書き数字の画像のようにする。</li>
+  <li>288個の数値を、<b>288 → 64 → 10</b> の小さな全結合ネットワーク（MLP）に入れる。</li>
+  <li>10個の出力のうち、いちばん大きいものが答えの数字。</li>
+</ol>
+
+<h3>自分で書いた int8 推論エンジン</h3>
+<p>この作品のモデルは、TensorFlow Lite などのライブラリを使わず、<strong>推論のプログラムを自分で C++ で書いています</strong>。288×64 + 64×10 の掛け算と足し算を、int8 でひたすら計算するだけ。3章で「手書きのCもアリ」と書いたのは、まさにこれです。</p>
+
+<pre><code>// 考え方のイメージ（実際のコードは firmware/mnist_inference.cpp）
+for (int j = 0; j &lt; 64; j++) {          // 隠れ層の64個それぞれについて
+  int32_t sum = bias1[j];
+  for (int i = 0; i &lt; 288; i++) {       // 288マスぶん
+    sum += input[i] * w1[j][i];          // int8 × int8 を int32 に足していく
+  }
+  hidden[j] = relu(requantize(sum));     // 0未満は0にして、int8 に戻す
+}
+// 出力層も同じように計算して、いちばん大きい番号が答え</code></pre>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>項目</th><th>値</th></tr></thead>
+  <tbody>
+    <tr><td>モデル</td><td>288 → 64 → 10 の全結合（ReLU）</td></tr>
+    <tr><td>重みの大きさ（int8）</td><td><b>19,072 バイト</b>（約19KB）</td></tr>
+    <tr><td>正解率（float32）</td><td>97.33%</td></tr>
+    <tr><td>正解率（int8）</td><td><b>97.34%</b></td></tr>
+  </tbody>
+</table>
+</div>
+<p style="font-size:14px;color:var(--muted)">MNIST（手書き数字の定番データ）のテスト画像1万枚を 16×18 に縮めて評価。実際のタッチパネルで書いた字での正解率は、これから確かめる予定です。</p>
+
+<p>注目してほしいのは、<strong>int8 にしても正解率がまったく落ちていない</strong>こと（むしろ0.01%だけ上がっています）。3章の「量子化しても、AIは意外なほど平気」を、数字で確かめられる実例です。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：データの「形」が合わないと……</span>
+  <p>この作品では、線を1ピクセルの細さにした版も試しています。ところが、太い線で学習したモデルに、細い線を太らせなおしたデータを見せたら、正解率は約42%まで下がってしまいました。人間には同じ数字に見えても、AIにとっては「見たことのない形」だったんですね。<strong>学習と本番で、データの形をそろえる</strong>。エッジAIでいちばんよくつまずくポイントです。</p>
+</div>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/My_Dad-s_Back">airpocket-soundman/My_Dad-s_Back</a></p>
+
+<h2>micro:bit でほかに作ったもの</h2>
+
+<ul>
+  <li><b>micro耳it</b>：家電の「ピー」という音を micro:bit が聞きつけて、無線で知らせてくれる作品。たのしいmicro:bitコンテスト2023のエントリー作品です（<a href="https://github.com/airpocket-soundman/micromimit">micromimit</a>）。音を聞き分けるところをAIにしたら……と想像がふくらみます。</li>
+  <li><b>microgatagot</b>：micro:bit でプラレールを自動運転（<a href="https://github.com/airpocket-soundman/microgatagot">microgatagot</a>）。</li>
+  <li><b>月齢ドーナツ</b>、<b>bit_chan</b>：サーボで動くかわいい作品たち（<a href="https://github.com/airpocket-soundman/moon_donuts">moon_donuts</a>、<a href="https://github.com/airpocket-soundman/bit_chan">bit_chan</a>）。</li>
+</ul>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>micro:bit V2 と micro:bit CreateAI で、「振る」「傾ける」「じっとしている」の3つを見分けるAIを作ってみましょう。できたら、判定結果に合わせてLEDに顔を出す。10分で「自分で作ったAI」が完成します。</p>
+</div>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>My_Dad-s_Back：micro:bit 上での推論時間を測って追記する。</li>
+  </ul>
+</div>

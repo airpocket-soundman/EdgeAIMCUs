@@ -1,0 +1,69 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第13章</span>
+  <h1>まだまだいる！ほかのマイコンたち</h1>
+  <p class="chapter-lead">第2部の最後は、作者の作品に登場した個性ゆたかなマイコンたちを、駆け足で紹介します。</p>
+</div>
+
+<h2>Kendryte K210（Sipeed Maix Bit、M5StickV）</h2>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>コア</th><td>RISC-V 64bit ×2、400MHz</td></tr>
+    <tr><th>SRAM</th><td>8MB（うち 2MB は AI 用）</td></tr>
+    <tr><th>AIの助っ人</th><td><b>KPU</b>（畳み込みニューラルネットワーク専用のアクセラレータ）、マイクアレイ用の音声処理回路</td></tr>
+    <tr><th>開発環境</th><td>MaixPy（MicroPython）、Kendryte SDK</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>K210 は、「マイコンでカメラAI」がまだ珍しかったころに登場して、多くのメイカーを驚かせたチップです。SRAM が 8MB もあり、KPU で顔検出や物体検出がサクサク動きました。</p>
+
+<p>作者は、K210 の<strong>マイクアレイ用の回路</strong>に注目しました。6＋1個のマイクを並べたボードをつなぐと、音がどの方向から来ているかをチップが計算してくれます。これを使って作ったのが、</p>
+
+<ul>
+  <li><b>SoundVisualizer</b>：カメラの映像に「音の出どころ」を色で重ねて表示する、持ち運べるサウンドカメラ（<a href="https://github.com/airpocket-soundman/SoundVisualizer">SoundVisualizer</a>）。</li>
+  <li><b>SoundCamera</b>：同じしくみで、パソコン用のサウンドカメラにしたもの（<a href="https://github.com/airpocket-soundman/SoundCamera">SoundCamera</a>）。</li>
+</ul>
+
+<p>どちらもニューラルネットワークは使っていませんが、「音の方向がわかる」ことは、音のAIの前処理としてとても強力です。「どこから鳴ったか」と「何の音か」を組み合わせたら……と想像すると、ワクワクしてきませんか？</p>
+
+<p>M5StickV（K210 搭載）は、サーボで文字を表示する <b>mechanical_display</b>（<a href="https://github.com/airpocket-soundman/mechanical_display">mechanical_display</a>）の司令塔としても活躍しました。</p>
+
+<h2>ESP32（初代）：M5Stack の定番</h2>
+
+<p>5章の ESP32-S3 の先輩です。M5Stack Core / Core2、M5StickC Plus、ATOM Matrix など、たくさんのボードに載っていて、作者の作品にも一番たくさん登場します。</p>
+
+<ul>
+  <li>Xtensa LX6 ×2、240MHz、SRAM 520KB</li>
+  <li>S3 のようなAI向けのベクトル命令はないものの、小さな分類モデルなら十分に動きます</li>
+  <li>UIFlow（ブロック）でも作れるので、ワークショップにも便利（<a href="https://github.com/airpocket-soundman/M5ColorFinderWS">M5ColorFinderWS</a>）</li>
+</ul>
+
+<p>作品の例：スマートスケール（<a href="https://github.com/airpocket-soundman/M5StackSmartScale">M5StackSmartScale</a>）、ストロボスコープの表示側（<a href="https://github.com/airpocket-soundman/Stroboscope">Stroboscope</a>）、スタックチャンの練習（<a href="https://github.com/airpocket-soundman/stackchan_try">stackchan_try</a>）、ATOM Matrix のクリスマスツリー（<a href="https://github.com/airpocket-soundman/AtomMatrixTree">AtomMatrixTree</a>）、FPVカー（<a href="https://github.com/airpocket-soundman/RoverC_FPVCar">RoverC_FPVCar</a>）など。センサーの値を集めてパソコンやサーバーに送る役としても、仕事の現場で活躍しています。</p>
+
+<h2>Renesas RA4M1（Arduino UNO R4）</h2>
+
+<ul>
+  <li>Cortex-M4F、48MHz、SRAM 32KB、Flash 256KB</li>
+  <li>Arduino UNO の第4世代。おなじみの形のまま、中身が 32ビットの Cortex-M4 になりました</li>
+</ul>
+
+<p>作者はストロボスコープで、フラッシュを光らせるタイミングの係に使っています（<a href="https://github.com/airpocket-soundman/M5Stack_Stroboscope">M5Stack_Stroboscope</a>）。SRAM 32KB は AIにはちょっと小さめですが、DSP命令を持つ Cortex-M4F なので、加速度の簡単な分類くらいなら挑戦できます。</p>
+
+<h2>マイコンのその先：Axera AX630C（M5Stack Module LLM）</h2>
+
+<p>4章の最後で紹介した <b>AI SoC</b> の代表です。M5Stack の <b>Module LLM</b> に載っていて、小さな言語モデル（LLM）や音声認識、物体検出を手のひらサイズで動かせます。</p>
+
+<p>作者は、M5StickC Plus2 などの ESP32 ボードから UART で Module LLM に話しかける実験をしています（<a href="https://github.com/airpocket-soundman/M5Stack_LLM">M5Stack_LLM</a>）。<strong>マイコンが「窓口」、AI SoC が「頭脳」</strong>という組み合わせは、マイコン単体では届かない大きなAIを、マイコンの作品に取り入れる近道です。</p>
+
+<h2>Raspberry Pi（Linux のシングルボードコンピュータ）</h2>
+
+<p>マイコンではありませんが、ひとつ上のクラスのエッジAIとして、Raspberry Pi も作者の作品にたくさん登場します。古い8mmフィルムカメラをデジタル化する一連の作品（<a href="https://github.com/airpocket-soundman/yashica8">yashica8</a>、<a href="https://github.com/airpocket-soundman/retrofit-8mm-movie-camera-V2">retrofit-8mm-movie-camera-V2</a> ほか）では、Raspberry Pi Zero 2 W がカメラの心臓部です。</p>
+
+<p>Raspberry Pi Zero 2 W でも、YOLOX のような物体検出モデルを動かせます。「マイコンでは足りないけど、GPU までは要らない」。そんなときの頼れる選択肢です。</p>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>ここまで読んで気になったマイコンはありましたか？ 付録Aに、作者のリポジトリに登場したマイコンをまとめました。次に遊ぶ1枚を選ぶ参考にしてください。</p>
+</div>

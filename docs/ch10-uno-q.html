@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10章 Arduino UNO Q（STM32U585 ＋ QRB2210）｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch10-uno-q.html" class="current"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第10章</span>
+  <h1>Arduino UNO Q（STM32U585 ＋ QRB2210）</h1>
+  <p class="chapter-lead">おなじみの Arduino の形に、マイコンと Linux コンピュータが同居。「二刀流」でエッジAIを楽しみます。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>Arduino UNO Q</b> は、見た目はおなじみの Arduino UNO。でも中身はまったくの別物です。1枚の基板に、</p>
+
+<ul>
+  <li><b>マイコン</b>：ST の <b>STM32U585</b>（Cortex-M33）</li>
+  <li><b>Linux が動くプロセッサ</b>：Qualcomm の <b>QRB2210</b>（Cortex-A53 ×4）</li>
+</ul>
+
+<p>の2つが載っていて、おたがいに <b>Bridge</b> という仕組みで会話できます。4章の「グループD：二刀流タイプ」です。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>マイコン側</th><th>Linux 側</th></tr></thead>
+  <tbody>
+    <tr><th>チップ</th><td>STM32U585</td><td>Qualcomm QRB2210</td></tr>
+    <tr><th>コア</th><td>Cortex-M33、160MHz</td><td>Cortex-A53 ×4、2.0GHz ＋ GPU</td></tr>
+    <tr><th>メモリ</th><td>SRAM 786KB、Flash 2MB</td><td>RAM 2GB または 4GB</td></tr>
+    <tr><th>得意なこと</th><td>センサーを正確なタイミングで読む、モーター制御</td><td>重い計算、Python、Web画面、音声合成</td></tr>
+    <tr><th>プログラム</th><td>Arduino スケッチ（Zephyr ベース）</td><td>Python（Debian Linux）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>開発は <b>Arduino App Lab</b> で、マイコン側のスケッチと Linux 側の Python を1つの「アプリ」としてまとめて扱えます。</p>
+
+<h2>二刀流の使い分け</h2>
+
+<p>作者の UNO Q の作品は、どれも同じ役割分担になっています。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 660 170" role="img" aria-label="UNO Qの役割分担">
+      <rect x="5" y="20" width="110" height="130" rx="14" class="surface"/>
+      <text x="60" y="80" font-size="13" text-anchor="middle">センサー</text>
+      <text x="60" y="100" font-size="12" text-anchor="middle" class="muted">マイク・加速度</text>
+      <rect x="150" y="20" width="200" height="130" rx="14" class="teal-soft"/>
+      <text x="250" y="50" font-size="14" text-anchor="middle" font-weight="800">STM32U585</text>
+      <text x="250" y="78" font-size="12" text-anchor="middle">1秒に数万回の読み取り</text>
+      <text x="250" y="98" font-size="12" text-anchor="middle">「何か起きた」を見つける</text>
+      <text x="250" y="118" font-size="12" text-anchor="middle">波形を切り出して渡す</text>
+      <rect x="400" y="20" width="250" height="130" rx="14" class="accent-soft"/>
+      <text x="525" y="50" font-size="14" text-anchor="middle" font-weight="800">QRB2210（Linux）</text>
+      <text x="525" y="78" font-size="12" text-anchor="middle">特徴量を計算して</text>
+      <text x="525" y="98" font-size="12" text-anchor="middle"><tspan font-weight="800">AIで推論</tspan></text>
+      <text x="525" y="118" font-size="12" text-anchor="middle">画面表示・音を鳴らす</text>
+      <polygon points="120,79 132,85 120,91" class="accent"/>
+      <polygon points="360,79 372,85 360,91" class="accent"/>
+      <text x="375" y="70" font-size="11" text-anchor="middle" class="muted">Bridge</text>
+    </svg>
+  </div>
+  <figcaption>図10-1 マイコンは「正確なタイミング」、Linux は「重い計算」。得意なことを分け合います。</figcaption>
+</figure>
+
+<p>Linux は便利ですが、「ぴったり 39マイクロ秒ごとにセンサーを読む」ような仕事は苦手です。逆にマイコンは、大きなモデルやたくさんのデータを扱うのが苦手。<strong>それぞれの得意なことだけをやらせる</strong>のが、二刀流ボードのいちばんおいしい使い方です。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：これもエッジAI？</span>
+  <p>UNO Q の作品では、AIの推論は Linux 側で動いています。「それってマイコンでAIを動かしてるの？」と聞かれると、正確には「ちがう」。でも、センサーのすぐそばの1枚の基板の上で、ネットにつながずにAIが答えを出しているという意味では、立派なエッジAIです。この本では、マイコンと組み合わせて使うこうしたボードも仲間として紹介していきます。</p>
+</div>
+
+<h2>実例1：IchiPing を UNO Q へ（IchiPing-UNO-Q）</h2>
+
+<p>7章の IchiPing（音で窓の開け閉めを当てる）の UNO Q 版です。</p>
+<ul>
+  <li>STM32U585：スピーカーとマイクの入出力をリアルタイムで担当</li>
+  <li>QRB2210：音の処理と、1次元 CNN による推論を担当</li>
+</ul>
+
+<p>おもしろいのは、<strong>MCX N947 で100%だったモデルを UNO Q の上でそのまま使うと、正解率が20.8%まで落ちた</strong>ことです。マイクやスピーカー、置き場所が変わると、「響き」の聞こえ方も変わってしまうんですね。</p>
+
+<p>そこで、UNO Q の実機でデータを録りなおし、さらに温度変化で音の高さがわずかにずれることを見こして、周波数を少しだけ伸び縮みさせたデータで水増し（データ拡張）しました。その結果、</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>条件</th><th>32状態</th><th>14グループ</th></tr></thead>
+  <tbody>
+    <tr><td>安定した状態（朝9時）</td><td class="num">91.7%</td><td class="num">100%</td></tr>
+    <tr><td>温度変化で音の高さがずれた状態</td><td class="num">74.7〜81.9%</td><td class="num">100%</td></tr>
+    <tr><td>人の話し声が流れている状態</td><td class="num">81.9%</td><td class="num">100%</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>まで回復しました。14グループの判定は、どの条件でも100%を保っています。「機械が変われば、AIも学び直し」。エッジAIを別のボードに引っ越すときの、大事な教訓です。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/IchiPing-UNO-Q">airpocket-soundman/IchiPing-UNO-Q</a></p>
+
+<h2>実例2：アクリル板の楽器を UNO Q へ（acrylic_pan_uno_q）</h2>
+
+<p>8章のアクリル板の楽器を、UNO Q で作りなおしたものです。</p>
+<ul>
+  <li>STM32U585：加速度センサー（KX134）を SPI で 1秒に25,600回 読み、たたいた瞬間に 512サンプルを切り出す</li>
+  <li>QRB2210：特徴量を計算して、128-32-12 のモデルで12エリアを推論。Web画面を表示し、FluidSynth で音を鳴らす</li>
+</ul>
+
+<p>Solist-AI では「16KB に収める」ことが最大のテーマでしたが、UNO Q の Linux 側ならメモリはたっぷり。画面や音の演出にも力を入れられます。同じ作品でも、マイコンの性格が変わると<strong>がんばりどころが変わる</strong>のがおもしろいところです。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan_uno_q">airpocket-soundman/acrylic_pan_uno_q</a></p>
+
+<h2>実例3：口笛をまねる、ちくわ笛ロボット（chikuwa-flute-robot）</h2>
+
+<p>ちくわで作った笛を、ロボットが吹く。しかも、人の口笛の音程をまねして吹く。そんなロボットのための<strong>強化学習</strong>の環境です。</p>
+
+<ul>
+  <li>笛の中のピストン（プランジャー）の位置を、モーターで動かして音程を変えます。</li>
+  <li>位置センサーのかわりに、<b>笛の音程そのもの</b>を位置の手がかりにする、というアイデアで制御します。</li>
+  <li>シミュレーターと学習スクリプトは <b>numpy だけ</b>で書かれていて、UNO Q の Linux 側でそのまま動かせるようにしています。</li>
+  <li>マイコン側では、I2S マイク（ICS-43434）の音を STM32U585 の SAI で取り込む実験を進めています。</li>
+</ul>
+
+<p>「分類」だけでなく、「うまく吹けたらごほうび」で上達していく強化学習も、エッジAIの楽しい遊び方のひとつです。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/chikuwa-flute-robot">airpocket-soundman/chikuwa-flute-robot</a></p>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>STM32U585 側だけで小さなモデルを動かす実例（ST Edge AI や TFLite Micro）を足して、「マイコン側でもAI」の比較をしたい。</li>
+    <li>ちくわ笛ロボット：実機での結果が出たら追記する。</li>
+  </ul>
+</div>
+
+<nav class="pager"><a class="prev" href="ch09-spresense.html"><small>← まえへ</small>9章 Sony Spresense（CXD5602）</a><a class="next" href="ch11-microbit.html"><small>つぎへ →</small>11章 micro:bit（nRF52833）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

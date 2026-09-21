@@ -1,0 +1,89 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第4章</span>
+  <h1>エッジAIを動かせるマイコンたち</h1>
+  <p class="chapter-lead">マイコンにも得意・不得意があります。第2部で活躍するマイコンたちを、ここで一気に紹介しちゃいましょう。</p>
+</div>
+
+<h2>AI向きのマイコンを見分ける4つのポイント</h2>
+
+<p>2章と3章の話をまとめると、AIが得意なマイコンかどうかは、だいたい次の4つで見分けられます。</p>
+
+<div class="cards">
+  <div class="card"><div class="card-emoji">🧮</div><h4>① 計算の力</h4><p>クロック周波数と、積和演算をまとめてこなせる命令（DSP・ベクトル命令）があるか。</p></div>
+  <div class="card"><div class="card-emoji">🗄️</div><h4>② メモリの広さ</h4><p>SRAM（作業机）がどれだけあるか。PSRAM を足せるか。画像を扱うならここが一番効きます。</p></div>
+  <div class="card"><div class="card-emoji">🚀</div><h4>③ AI専用の回路</h4><p>NPU などのアクセラレータを積んでいるか。あれば桁違いに速くなることも。</p></div>
+  <div class="card"><div class="card-emoji">🧰</div><h4>④ 道具のそろい方</h4><p>メーカーがAI用のライブラリや変換ツールを用意しているか。初心者にはここがとても大事。</p></div>
+</div>
+
+<p>ここに、<b>⑤ センサーのつなぎやすさ</b>を足してもいいでしょう。マイクやカメラがはじめから載っているボードなら、配線に悩まずにすぐAIを試せます。</p>
+
+<h2>マイコンを4つのグループに分けてみる</h2>
+
+<p>AIとの付き合い方で分けると、マイコンはざっくり次の4グループになります。</p>
+
+<h3>グループA：すなおなCPUタイプ</h3>
+<p>AI専用の機能は持たないけれど、CPUの力で小さなAIを動かせるマイコン。<b>RP2040</b>（Raspberry Pi Pico）、<b>nRF52833</b>（micro:bit V2）、<b>ESP32</b>（初代）など。センサーの値の分類や、手書き数字の認識くらいなら十分にこなせます。<strong>「AIのしくみを手で確かめる」</strong>のにぴったりのグループです。</p>
+
+<h3>グループB：DSP・ベクトル命令でがんばるタイプ</h3>
+<p>積和演算をまとめて計算できる命令を持ったマイコン。<b>ESP32-S3</b>、<b>ESP32-P4</b>、Cortex-M33 の <b>RP2350</b>・<b>STM32U585</b>、Cortex-M4F が6つもある <b>Spresense（CXD5602）</b>など。音のキーワード検出や、小さな画像の人物検出が視野に入ってきます。<strong>いまエッジAIで遊ぶなら、いちばん層の厚いゾーン</strong>です。</p>
+
+<h3>グループC：NPU・AIアクセラレータ内蔵タイプ</h3>
+<p>AIの計算専用の回路を持ったマイコン。NXP の <b>MCX N947</b>（eIQ Neutron NPU）、ROHM の <b>Solist-AI（ML63Q2557）</b>、Sipeed の <b>K210</b>（KPU）など。同じ電力でぐっと速く計算できたり、マイコンの上で<strong>学習までできてしまったり</strong>と、それぞれ個性が強いのが特徴です。</p>
+
+<h3>グループD：マイコン＋Linux の二刀流タイプ</h3>
+<p>厳密にはマイコンだけではありませんが、最近はマイコンと Linux が動くプロセッサを1枚に載せたボードも出てきました。<b>Arduino UNO Q</b>（STM32U585 ＋ Qualcomm QRB2210）がその代表。重いAIは Linux 側、センサーの読み取りやモーター制御はマイコン側、と役割分担できます。</p>
+
+<h2>一覧表：第2部に登場するマイコンたち</h2>
+
+<p>第2部で取り上げるマイコンの主なスペックを並べてみました。数値は各メーカーの公開資料にもとづく代表値で、同じチップでもボードによって外付けのメモリなどが変わります。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>マイコン</th><th>代表的なボード</th><th>コア</th><th>クロック</th><th>内蔵SRAM</th><th>AIの助っ人</th><th>グループ</th></tr></thead>
+  <tbody>
+    <tr><td><b>ESP32-S3</b></td><td>AtomS3、CoreS3、StickS3、XIAO ESP32S3</td><td>Xtensa LX7 ×2</td><td class="num">240MHz</td><td class="num">512KB</td><td>ベクトル命令、PSRAM（数MB）</td><td>B</td></tr>
+    <tr><td><b>ESP32-P4</b></td><td>M5Stack Tab5</td><td>RISC-V ×2（＋省電力コア）</td><td class="num">400MHz<br><small>（Tab5 は 360MHz）</small></td><td class="num">768KB</td><td>AI向け拡張命令（PIE）、PSRAM（Tab5は32MB）</td><td>B</td></tr>
+    <tr><td><b>MCX N947</b></td><td>FRDM-MCXN947</td><td>Cortex-M33 ×2</td><td class="num">150MHz</td><td class="num">512KB</td><td><b>eIQ Neutron NPU</b></td><td>C</td></tr>
+    <tr><td><b>ML63Q2557</b>（Solist-AI）</td><td>DT-EBML63Q2557</td><td>Cortex-M0+</td><td class="num">48MHz</td><td class="num">16KB</td><td><b>AxlCORE-ODL</b>（推論＋その場で学習）</td><td>C</td></tr>
+    <tr><td><b>CXD5602</b></td><td>Sony Spresense</td><td>Cortex-M4F ×6</td><td class="num">156MHz</td><td class="num">1.5MB</td><td>マルチコア、DSP命令</td><td>B</td></tr>
+    <tr><td><b>STM32U585</b></td><td>Arduino UNO Q（マイコン側）</td><td>Cortex-M33</td><td class="num">160MHz</td><td class="num">786KB</td><td>DSP命令、Linux側と連携</td><td>B / D</td></tr>
+    <tr><td><b>RP2350</b></td><td>Raspberry Pi Pico 2、XIAO RP2350</td><td>Cortex-M33 ×2（RISC-V に切替可）</td><td class="num">150MHz</td><td class="num">520KB</td><td>DSP命令</td><td>B</td></tr>
+    <tr><td><b>RP2040</b></td><td>Raspberry Pi Pico</td><td>Cortex-M0+ ×2</td><td class="num">133MHz</td><td class="num">264KB</td><td>PIO（入出力が得意）</td><td>A</td></tr>
+    <tr><td><b>nRF52833</b></td><td>micro:bit V2</td><td>Cortex-M4F</td><td class="num">64MHz</td><td class="num">128KB</td><td>マイク・加速度センサーがボードに載っている</td><td>A</td></tr>
+    <tr><td><b>K210</b></td><td>Maix Bit、M5StickV</td><td>RISC-V 64bit ×2</td><td class="num">400MHz</td><td class="num">8MB</td><td><b>KPU</b>（画像AI用アクセラレータ）</td><td>C</td></tr>
+    <tr><td><b>ESP32</b>（初代）</td><td>M5Stack Core / Core2、StickC Plus</td><td>Xtensa LX6 ×2</td><td class="num">240MHz</td><td class="num">520KB</td><td>—</td><td>A</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道</span>
+  <p>表の中で、ML63Q2557 の SRAM が <b>16KB</b> しかないのに気づきましたか？ ほかのマイコンの30分の1ほどです。それでも、AI専用の回路と工夫しだいで、音や振動の分類がちゃんとできてしまいます。「メモリが大きい＝えらい」ではないのが、エッジAIのおもしろいところ。8章でその工夫をのぞいてみましょう。</p>
+</div>
+
+<h2>どれから始める？ 目的別おすすめ</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>やってみたいこと</th><th>おすすめ</th><th>理由</th></tr></thead>
+  <tbody>
+    <tr><td>とにかく安く、手軽に始めたい</td><td>ESP32-S3 のボード（AtomS3 など）</td><td>数千円で買えて、情報も道具も多い</td></tr>
+    <tr><td>子どもと一緒に、ブロックやPythonで</td><td>micro:bit V2</td><td>マイクと加速度センサーが最初から載っている</td></tr>
+    <tr><td>カメラで人やものを見分けたい</td><td>ESP32-S3（カメラ付き）、ESP32-P4、MCX N947</td><td>PSRAMやNPUがあると画像が扱いやすい</td></tr>
+    <tr><td>大きめのモデルで遊びたい</td><td>ESP32-P4（Tab5）</td><td>PSRAM 32MB と大きな画面で、画像生成まで試せる</td></tr>
+    <tr><td>AI専用チップのすごさを体感したい</td><td>FRDM-MCXN947、Solist-AI</td><td>NPU・アクセラレータを使うと世界が変わる</td></tr>
+    <tr><td>センサー処理と重いAIを両方やりたい</td><td>Arduino UNO Q</td><td>マイコンと Linux の役割分担ができる</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h2>マイコンのその先：AI SoC</h2>
+
+<p>最後に、この本の「すぐ外側」にいる仲間も紹介しておきます。M5Stack の <b>Module LLM</b> などに載っている Axera の <b>AX630C</b> のようなチップは、Linux が動くプロセッサに強力なNPUを組み合わせた<b>AI SoC</b>です。マイコンよりひとまわり大きな世界ですが、小さな言語モデル（LLM）や本格的な物体検出まで手のひらサイズで動きます。</p>
+
+<p>マイコンのボードとUARTでつないで「重い仕事はAI SoC、センサーと画面はマイコン」という組み合わせ方もできます。マイコンでエッジAIに慣れたら、次のステップとしてのぞいてみるのも楽しいですよ。</p>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>3章の「やってみよう」で決めた作りたいものに、どのグループのマイコンが合いそうか考えてみましょう。音や振動ならグループA・Bでも十分。カメラならB・C。迷ったら、まずは手元にあるボードで始めるのが一番の近道です。</p>
+</div>

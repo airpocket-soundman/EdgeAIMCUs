@@ -1,0 +1,127 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第9章</span>
+  <h1>Sony Spresense（CXD5602）</h1>
+  <p class="chapter-lead">コアが6つもある、ちょっと変わり者の高性能マイコン。ソニー純正のAIツールと組み合わせると、マウス操作だけでAIが作れます。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>Spresense（スプレッセンス）</b>は、ソニーが作ったマイコンボードです。心臓部の <b>CXD5602</b> は、もともと GPS 付きの腕時計のような「省エネで、でもしっかり計算したい機器」のために作られたチップ。そのせいか、ほかのマイコンにはない個性がいっぱい詰まっています。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>Sony CXD5602</td></tr>
+    <tr><th>コア</th><td>Arm Cortex-M4F（浮動小数点ユニット付き）<b>×6</b>、156MHz</td></tr>
+    <tr><th>SRAM</th><td>1.5MB</td></tr>
+    <tr><th>Flash</th><td>8MB（メインボード上）</td></tr>
+    <tr><th>とくいわざ</th><td>GPS（GNSS）内蔵、ハイレゾ音声の入出力、マルチマイク、専用カメラボード</td></tr>
+    <tr><th>開発環境</th><td>Arduino IDE、Spresense SDK（NuttX ベース）</td></tr>
+    <tr><th>AIの道具</th><td>Neural Network Console（NNC）＋ DNNRT ライブラリ、TensorFlow Lite for Microcontrollers</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>コアが6つあると、なにがうれしい？</h3>
+<p>1つのコアでセンサーを読み続けながら、別のコアでAIの計算をする、といった分業ができます。音や振動のように「データが途切れなく流れてくる」ものをAIで見張るのに向いています。</p>
+
+<h3>Neural Network Console でAIをつくる</h3>
+<p>Spresense ならではの楽しさが、ソニーの <b>Neural Network Console（NNC）</b>との組み合わせです。NNC は、ブロックを線でつなぐようにしてニューラルネットワークを組み立て、そのまま学習までできるアプリ。学習したモデルを <b>nnb</b> という形式で書き出して、Spresense の <b>DNNRT</b> ライブラリで読み込めば、もう推論ができてしまいます。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 660 120" role="img" aria-label="NNCからSpresenseへの流れ">
+      <g font-size="13" text-anchor="middle">
+        <rect x="5" y="30" width="140" height="60" rx="12" class="surface"/><text x="75" y="56">Spresense で</text><text x="75" y="75">データを録る</text>
+        <rect x="175" y="30" width="140" height="60" rx="12" class="violet-soft"/><text x="245" y="56">NNC で</text><text x="245" y="75">組み立て＆学習</text>
+        <rect x="345" y="30" width="140" height="60" rx="12" class="surface"/><text x="415" y="56">model.nnb を</text><text x="415" y="75">SDカードへ</text>
+        <rect x="515" y="30" width="140" height="60" rx="12" class="accent"/><text x="585" y="56" class="on-accent" font-weight="800">DNNRT で</text><text x="585" y="75" class="on-accent" font-weight="800">推論！</text>
+      </g>
+      <polygon points="150,54 162,60 150,66" class="accent"/>
+      <polygon points="320,54 332,60 320,66" class="accent"/>
+      <polygon points="490,54 502,60 490,66" class="accent"/>
+    </svg>
+  </div>
+  <figcaption>図9-1 NNC と Spresense の連携。プログラムを書くのは、データを録るところと推論するところだけ。</figcaption>
+</figure>
+
+<p>Arduino のスケッチから見ると、推論の部分は驚くほど短くなります。</p>
+
+<pre><code>#include &lt;SDHCI.h&gt;
+#include &lt;DNNRT.h&gt;
+
+SDClass SD;
+DNNRT dnnrt;
+
+void setup() {
+  SD.begin();
+  File nnbFile = SD.open("model.nnb");   // NNC で書き出したモデル
+  dnnrt.begin(nnbFile);                  // これで準備完了
+}
+
+void loop() {
+  DNNVariable input(512);                // 入力の箱を用意して
+  float *data = input.data();
+  // ... data[] にセンサーの値（特徴量）を入れる ...
+  dnnrt.inputVariable(input, 0);
+  dnnrt.forward();                       // 推論！
+  DNNVariable output = dnnrt.outputVariable(0);
+  int answer = output.maxIndex();        // いちばん確からしい答え
+}</code></pre>
+
+<h2>実例1：卵の茹で加減を、割らずに当てる（egg-analyzer）</h2>
+
+<p>「この卵、ちゃんと温泉卵になってる？」。割ってみないとわからないことを、AIで当ててみよう、という作品です。</p>
+
+<h3>しくみ</h3>
+<ol>
+  <li>卵をホルダーにセットして、<b>ステッピングモーターで回します</b>。</li>
+  <li>そのときのモーターの<b>電流</b>を、M5Stack 用の電流計ユニットで測ります。中身の固まり具合によって、回るときの「手ごたえ」が変わるはず、というアイデアです。</li>
+  <li>電流を 2.5ミリ秒ごとに 1024回（約2.6秒ぶん）記録します。</li>
+  <li>記録した波形を <b>FFT</b>（高速フーリエ変換）で「どんな揺れ方がどれくらい含まれているか」に変換して、512個の数値にします。</li>
+  <li>この512個を、NNC で学習した小さなニューラルネットワークに入れて、茹で加減を<b>3つのクラス</b>に分けます。</li>
+</ol>
+
+<p>ネットワークは、512個の入力を100個のニューロンで受ける全結合（Affine）層を中心にした、とてもシンプルなもの。画像AIのような複雑なしかけはいりません。<strong>3章の「前処理でAIを楽にする」</strong>のお手本のような作品です。FFT で揺れ方を取り出してあげたおかげで、AIは「どの揺れが強いか」を見比べるだけで済んでいます。</p>
+
+<div class="box tip">
+  <span class="box-title">ここがポイント</span>
+  <p>このAIが見ているのは、カメラの画像でもマイクの音でもなく、<b>モーターの電流</b>です。「見た目ではわからないけど、何かの数値にはちがいが出ているかも」と考えると、エッジAIのネタはぐっと広がります。</p>
+</div>
+
+<p>ハードウェアは、Spresense メインボードと拡張ボード、2.2インチの液晶（ILI9341）、A4988 モータードライバ、NEMA17 ステッピングモーター、電流計ユニット、そして3Dプリンタで作ったケースと卵ホルダー。部品表とソースコードはリポジトリで公開しています。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/egg-analyzer">airpocket-soundman/egg-analyzer</a></p>
+
+<h2>実例2：振動のパターンを見分ける（MPU6886_spresense）</h2>
+
+<p>こちらは、加速度センサー（MPU6886）で拾った振動を、その場でAIに分類させる実験です。</p>
+
+<ul>
+  <li>約0.33ミリ秒ごと（1秒に約3,000回）に加速度を読みます。</li>
+  <li>縦方向の加速度が<b>しきい値を超えた瞬間</b>を「イベント」とみなして、そこから少しさかのぼったところ（50サンプル前）から、合計320サンプルを切り出します。</li>
+  <li>切り出した波形をそのまま NNC で学習したモデルに入れて、DNNRT で推論します。</li>
+</ul>
+
+<p>「ずっと推論し続ける」のではなく、「何か起きたときだけ推論する」。これは、電池で動かす機器でよく使う省エネの工夫です。さかのぼって記録しておくのは、イベントの<b>始まりの部分</b>を取りこぼさないため。小さなしかけですが、精度にしっかり効いてきます。</p>
+
+<p>データ集め用のスケッチ（<code>collect_vibration_data_02</code>）と、推論用のスケッチ（<code>inference_from_vibration_001</code>）が分かれているので、3章の「①データを集める → ⑤推論する」の流れがそのまま追えます。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/MPU6886_spresense">airpocket-soundman/MPU6886_spresense</a></p>
+
+<h2>ほかにも Spresense で作ったもの</h2>
+
+<ul>
+  <li><b>SORA-Q の改造</b>：月面探査ロボット SORA-Q のおもちゃ版に Spresense とカメラを載せたプロジェクト。NNC で25種類の画像を見分けるモデルを学習する実験もしています（<a href="https://github.com/airpocket-soundman/SORA-Q">SORA-Q</a>、<a href="https://github.com/airpocket-soundman/SPRESENSE-SORA-Q-challenge">SPRESENSE-SORA-Q-challenge</a>）。</li>
+  <li><b>シュリーレン撮影装置</b>：空気のゆらぎを見えるようにする撮影装置（<a href="https://github.com/airpocket-soundman/Schlieren_photography">Schlieren_photography</a>）。</li>
+  <li><b>二相界面の可視化</b>：ステッピングモーターで液体と気体の境目の動きを見せる作品（<a href="https://github.com/airpocket-soundman/Two-phase_interface">Two-phase_interface</a>）。</li>
+</ul>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>egg-analyzer：3クラスそれぞれの意味、正解率、推論時間を実機で確認して追記する。</li>
+    <li>MPU6886_spresense：分類している振動の種類と、正解率を追記する。</li>
+    <li>SORA-Q：25クラスのモデルを実機で動かしたかどうかを確認する。</li>
+  </ul>
+</div>

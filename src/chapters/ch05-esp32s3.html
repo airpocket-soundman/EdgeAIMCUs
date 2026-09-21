@@ -1,0 +1,92 @@
+<div class="chapter-head">
+  <span class="chapter-kicker">第5章</span>
+  <h1>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</h1>
+  <p class="chapter-lead">安くて、小さくて、Wi-Fi もついて、AIもいける。エッジAI入門の「最初の1枚」にいちばんおすすめしたいマイコンです。</p>
+</div>
+
+<h2>ボード紹介</h2>
+
+<p><b>ESP32-S3</b> は、中国の Espressif（エスプレッシフ）社のマイコンです。Wi-Fi と Bluetooth を内蔵した ESP32 シリーズの中で、<strong>AIを意識して作られた</strong>のがこの S3。積和演算をまとめて計算するベクトル命令が追加されています。</p>
+
+<div class="table-wrap">
+<table>
+  <tbody>
+    <tr><th>チップ</th><td>Espressif ESP32-S3</td></tr>
+    <tr><th>コア</th><td>Xtensa LX7 ×2、最大240MHz、ベクトル命令つき</td></tr>
+    <tr><th>SRAM</th><td>512KB（＋ボードによって PSRAM 2〜8MB）</td></tr>
+    <tr><th>Flash</th><td>ボードによって 4〜16MB</td></tr>
+    <tr><th>通信</th><td>Wi-Fi、Bluetooth LE</td></tr>
+    <tr><th>とくいわざ</th><td>カメラ入力、USB、たくさんのボードと豊富な情報</td></tr>
+    <tr><th>開発環境</th><td>Arduino IDE、PlatformIO、ESP-IDF、UIFlow、MicroPython</td></tr>
+    <tr><th>AIの道具</th><td>ESP-DL、ESP-SR（音声）、ESP-WHO（顔）、TensorFlow Lite for Microcontrollers（ESP-NN で高速化）、Edge Impulse</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>ボードの選び放題</h3>
+
+<p>ESP32-S3 のいいところは、これを載せたボードがとにかくたくさんあること。作者の作品に登場したものだけでも、こんなにあります。</p>
+
+<div class="cards">
+  <div class="card"><div class="card-emoji">🧊</div><h4>M5Stack AtomS3</h4><p>約2.4cm角に画面つき。センサーをつないで、ちょっと試すのに最高。</p></div>
+  <div class="card"><div class="card-emoji">📷</div><h4>M5Stack CoreS3</h4><p>カメラ・マイク・画面・PSRAM 全部入り。画像AIならまずこれ。</p></div>
+  <div class="card"><div class="card-emoji">🥢</div><h4>M5StickS3</h4><p>スティック型。持ち歩いて使う作品に。</p></div>
+  <div class="card"><div class="card-emoji">⌨️</div><h4>M5Stack Cardputer</h4><p>キーボードつきの小さなコンピュータ。</p></div>
+  <div class="card"><div class="card-emoji">🎛️</div><h4>M5Stack Dial</h4><p>回せる丸い画面。UIの実験に。</p></div>
+  <div class="card"><div class="card-emoji">🔌</div><h4>M5Stamp S3 / XIAO ESP32S3</h4><p>切手サイズ。自分の基板に組み込むときに。XIAO ESP32S3 Sense にはカメラとマイクもつきます。</p></div>
+</div>
+
+<h2>実例：カメラで人を見つける（UHD-challenge）</h2>
+
+<p>「超軽量の人物検出モデルを、マイコンで動かしてみよう」という挑戦です。</p>
+
+<h3>使っているモデル：UHD</h3>
+<p>使っているのは、PINTO さんが公開している <b>UHD（Ultra-lightweight Human Detection）</b>という人物検出モデルです。名前のとおり、とことん軽くなるように作られています。</p>
+
+<ul>
+  <li>入力：<b>64×64 ピクセル</b>のカラー画像</li>
+  <li>出力：人がいる場所の四角（バウンディングボックス）と、その確からしさ</li>
+  <li>大きさ違いのバリエーションがあり、いちばん軽い「N」は約138万パラメータ</li>
+</ul>
+
+<p>64×64 というと、スマホの写真の数千分の一の画素数です。それでも「人がどこにいるか」くらいはわかる。エッジAIの割り切りのうまさがよく出ています。</p>
+
+<h3>マイコンへの載せ方</h3>
+<ol>
+  <li>ONNX 形式で配られているモデルを、Espressif の <b>ESP-DL</b> 用の形式（<code>.espdl</code>）に変換します。変換のときに int8 に量子化します。</li>
+  <li>M5Stack CoreS3 のカメラ（GC0308）で画像を撮り、64×64 に縮めます。</li>
+  <li>ESP-DL で推論し、出てきた候補から重なりを取り除く後処理（NMS）をして、人の位置を画面に描きます。</li>
+</ol>
+
+<p>開発は Arduino（PlatformIO）版と ESP-IDF 版の両方で進めていて、Tab5（ESP32-P4）や XIAO ESP32S3 Sense への移植も計画しています。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：PSRAM とカメラ</span>
+  <p>カメラの画像は、64×64 に縮める前の段階ではそれなりに大きなデータです。CoreS3 では、この画像を受け取るために PSRAM を使います。実はこの挑戦で最初にぶつかった壁も、AIではなく「カメラと PSRAM をちゃんと動かす」ところでした。<strong>エッジAIの苦労の半分は、AIの手前にある</strong>。これはあるあるです。</p>
+</div>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/UHD-challenge">airpocket-soundman/UHD-challenge</a></p>
+
+<h2>ESP32-S3 でほかに作ったもの</h2>
+
+<p>AI以外でも、ESP32-S3 は作者の作品のあちこちで活躍しています。センサーの前処理や、AIの結果を使う側としても頼れる相棒です。</p>
+
+<ul>
+  <li><b>HydroSynth</b>：水面の波紋を距離センサーで読み取って、そのまま音に変えるシンセサイザー（<a href="https://github.com/airpocket-soundman/HydroSynth">HydroSynth</a>、<a href="https://github.com/airpocket-soundman/M5StickS3_TOF">M5StickS3_TOF</a>）。</li>
+  <li><b>Unit シリーズ</b>：懐かしいLED表示器や蛍光表示管を、M5Stamp S3 で M5Stack のユニットにしたもの（<a href="https://github.com/airpocket-soundman/Unit-HPDL-1414">Unit-HPDL-1414</a> ほか）。</li>
+  <li><b>lvgl_MCP</b>：AIエージェントに画面のUIを作らせて、CoreS3 で確かめるための開発ツール（<a href="https://github.com/airpocket-soundman/lvgl_MCP">lvgl_MCP</a>）。</li>
+  <li><b>IchiPing の Solist-AI 版</b>では、M5Stamp S3A がスピーカーとマイクの係として、AIチップを手伝っています（8章）。</li>
+</ul>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>CoreS3 か XIAO ESP32S3 Sense を持っていたら、ESP-WHO の顔検出サンプルを動かしてみましょう。カメラに顔を向けると四角が出る。それだけで、「マイコンが見ている！」という感動が味わえます。</p>
+</div>
+
+<div class="box todo">
+  <span class="box-title">執筆メモ</span>
+  <ul>
+    <li>UHD-challenge：CoreS3 での推論時間・FPS・メモリ使用量を実測して追記する。</li>
+    <li>音声（ESP-SR のウェイクワード）の実例を1つ足したい。</li>
+  </ul>
+</div>
