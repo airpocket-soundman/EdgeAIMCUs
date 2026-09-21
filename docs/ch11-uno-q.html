@@ -158,26 +158,105 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 
 <p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan_uno_q">airpocket-soundman/acrylic_pan_uno_q</a></p>
 
-<h2>実例3：口笛をまねる、ちくわ笛ロボット（chikuwa-flute-robot）</h2>
+<h2>実例3：やまびこ1号 ― 音だけを頼りに位置を当てる（chikuwa-flute-robot）</h2>
 
-<p>ちくわで作った笛を、ロボットが吹く。しかも、人の口笛の音程をまねして吹く。そんなロボットのための<strong>強化学習</strong>の環境です。</p>
+<p>人の口笛を聞いて、それをスライドホイッスルで吹き返すロボット、<b>やまびこ1号</b>。聞いた音を返すから「やまびこ」です。</p>
+
+<p>この作品のすごいところは、演奏そのものより<strong>位置センサーを1つも使っていない</strong>ことです。</p>
+
+<h3>音の高さを「ものさし」にする</h3>
+
+<p>スライドホイッスルは、筒の中のピストンを動かすと音の高さが変わる楽器です。ふつうのロボットなら、ピストンの位置を<b>エンコーダー</b>（位置センサー）で測って制御します。やまびこ1号は、そのセンサーをつけません。かわりに、</p>
+
+<p style="text-align:center;font-weight:800;font-size:1.05em">鳴っている音の高さ ＝ いまピストンがいる場所</p>
+
+<p>として、<strong>マイクの音だけを位置のものさしにする</strong>のです。</p>
+
+<p>ロマンのあるアイデアですが、このものさし、センサーとしてはかなりの困りもの。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>ふつうのエンコーダー</th><th>音のものさし</th></tr></thead>
+  <tbody>
+    <tr><td>遅れ</td><td>ほぼゼロ</td><td>10〜50ミリ秒。しかも個体ごとに違う</td></tr>
+    <tr><td>測れないとき</td><td>なし</td><td><b>鳴っていない間はまったく無信号</b></td></tr>
+    <tr><td>まちがい</td><td>なし</td><td>オクターブを間違えると、位置が2倍ずれる</td></tr>
+    <tr><td>余計な影響</td><td>なし</td><td>気温（約3セント/℃）、送風の圧力</td></tr>
+    <tr><td>目盛り</td><td>まっすぐ</td><td>曲がっている（音の高さは管の長さの逆数）</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>この5つを同時に相手にする「位置の推定係」を人の手で書くのは、かなり大変です。<strong>だからAIの出番</strong>。ここでのAIの役割は、ロボットを動かす<b>制御器</b>ではなく、いまどこにいるかを当てる<b>観測器</b>です。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：セントって？</span>
+  <p>音の高さのずれを表す単位です。半音が100セント、1オクターブが1200セント。人が「音痴だな」と感じ始めるのが、だいたい20〜30セントのずれだと言われます。この節に出てくる数字は、すべてこの単位です。</p>
+</div>
+
+<h3>「吹くほど慣れてくる」を、記憶だけでやる</h3>
+
+<p>さらにおもしろいのが、学習のさせ方です。笛は個体ごとに、モーターの速さも管の長さも微妙に違います。ふつうなら、機体ごとの数値を測って設定ファイルに書いておきます。やまびこ1号は、それをしません。</p>
 
 <ul>
-  <li>笛の中のピストン（プランジャー）の位置を、モーターで動かして音程を変えます。</li>
-  <li>位置センサーのかわりに、<b>笛の音程そのもの</b>を位置の手がかりにする、というアイデアで制御します。</li>
-  <li>シミュレーターと学習スクリプトは <b>numpy だけ</b>で書かれていて、UNO Q の Linux 側でそのまま動かせるようにしています。</li>
-  <li>マイコン側では、I2S マイク（ICS-43434）の音を STM32U585 の SAI で取り込む実験を進めています。</li>
+  <li>校正の手順も、設定ファイルも持たない</li>
+  <li>機体のクセは、AIモデル（GRU：記憶を持つ小さなニューラルネットワーク）の<strong>記憶の中だけ</strong>に持つ</li>
+  <li>記憶を消すのは電源を入れたときだけ。曲をまたいで持ち越す</li>
+  <li><strong>起動直後は下手で、何曲か吹くうちに合ってくる</strong></li>
 </ul>
 
-<p>「分類」だけでなく、「うまく吹けたらごほうび」で上達していく強化学習も、エッジAIの楽しい遊び方のひとつです。</p>
+<p>シミュレーター上で200台ぶんの笛を用意して比べた結果がこちらです（実際に鳴った音程のずれ、単位はセント。小さいほど上手）。</p>
 
-<p>リポジトリ：<a href="https://github.com/airpocket-soundman/chikuwa-flute-robot">airpocket-soundman/chikuwa-flute-robot</a></p>
+<div class="table-wrap">
+<table>
+  <thead><tr><th>位置の当て方</th><th>1曲目</th><th>2曲目</th><th>3曲目</th><th>4曲目</th><th>5曲目</th></tr></thead>
+  <tbody>
+    <tr><td>音を聞かない（推測だけ）</td><td class="num">221</td><td class="num">208</td><td class="num">239</td><td class="num">241</td><td class="num">212</td></tr>
+    <tr><td>位置センサーをつける</td><td class="num">75</td><td class="num">73</td><td class="num">75</td><td class="num">73</td><td class="num">73</td></tr>
+    <tr><td>音で直す（記憶なし）</td><td class="num">29.9</td><td class="num">28.3</td><td class="num">29.8</td><td class="num">32.0</td><td class="num">28.4</td></tr>
+    <tr><td><b>音で直す＋AIの記憶（GRU）</b></td><td class="num"><b>26.2</b></td><td class="num"><b>19.3</b></td><td class="num"><b>19.4</b></td><td class="num"><b>19.5</b></td><td class="num"><b>18.2</b></td></tr>
+    <tr><td>同じAIから記憶だけ消したもの</td><td class="num">26.2</td><td class="num">25.1</td><td class="num">26.5</td><td class="num">27.1</td><td class="num">25.1</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>読みどころが2つあります。</p>
+
+<ul>
+  <li><strong>音のものさしは、位置センサーより正確だった</strong>（30セント 対 75セント）。位置センサーは「ピストンがどこにいるか」は正確に知っていても、「その笛では、その位置で何の音が鳴るか」を知りません。音で聞けば、そこが一発でわかります。</li>
+  <li><strong>記憶があると、吹くほど上手くなる</strong>。まったく同じAIから記憶だけを消すと（いちばん下の行）、何曲吹いても1曲目と同じ下手さのまま。<strong>差は記憶だけ</strong>です。</li>
+</ul>
+
+<p>極めつけは、演奏の途中で<strong>笛を別の個体に付け替えたとき</strong>。AIには何も知らせません。それでも、</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>位置の当て方</th><th>2曲目</th><th>3曲目（付け替え直後）</th><th>4曲目</th><th>5曲目</th></tr></thead>
+  <tbody>
+    <tr><td>機体のクセを外部に記録する方式</td><td class="num">22.0</td><td class="num">37.2</td><td class="num">38.1</td><td class="num">32.0</td></tr>
+    <tr><td><b>AIの記憶（GRU）</b></td><td class="num">19.3</td><td class="num">32.4</td><td class="num"><b>20.8</b></td><td class="num"><b>18.6</b></td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>AIのほうは1曲で立ち直り、外部に記録する方式は古い記憶を引きずったままです。<strong>「いつ古い記憶を捨てるか」まで、学習で決まった</strong>ということ。ちょっと感動しませんか？</p>
+
+<h3>UNO Q での役割分担</h3>
+
+<ul>
+  <li><b>QRB2210（Linux 側）</b>：口笛の音程を解析し、AIが位置を推定して、10ミリ秒ごとにモーターの指示を出す。シミュレーターと学習のコードは <b>numpy だけ</b>で書かれていて、そのまま UNO Q の Linux 側で動かせます（学習そのものはGPU付きのPCで実施）。</li>
+  <li><b>STM32U585（マイコン側）</b>：I2S マイク（ICS-43434）の音を SAI で取り込み、モーターとバルブを正確なタイミングで動かす。</li>
+</ul>
+
+<p>「分類して終わり」ではなく、<strong>AIが現実世界を相手に、リアルタイムで手を動かす</strong>。これもエッジAIの、とびきり楽しい遊び方です。</p>
+
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/chikuwa-flute-robot">airpocket-soundman/chikuwa-flute-robot</a>（設計メモは <code>docs/yamabiko.md</code>）</p>
 
 <div class="box todo">
   <span class="box-title">執筆メモ</span>
   <ul>
     <li>STM32U585 側だけで小さなモデルを動かす実例（ST Edge AI や TFLite Micro）を足して、「マイコン側でもAI」の比較をしたい。</li>
-    <li>ちくわ笛ロボット：実機での結果が出たら追記する。</li>
+    <li>やまびこ1号：上の数字はシミュレーターでの結果。実機が組み上がったら、実測に差し替える。</li>
   </ul>
 </div>
 
