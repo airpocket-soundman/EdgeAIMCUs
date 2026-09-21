@@ -33,6 +33,34 @@ TOC = [
     ("appendix-candidates.html", "付録", "付録A", "作者のリポジトリに登場したマイコン一覧", False),
 ]
 
+# 章番号を繰り下げる前の古いURL -> 現在のURL（ブックマーク切れを防ぐための転送）
+REDIRECTS = {
+    "ch05-esp32s3.html": "ch06-esp32s3.html",
+    "ch06-esp32p4.html": "ch07-esp32p4.html",
+    "ch07-mcxn947.html": "ch08-mcxn947.html",
+    "ch08-solist-ai.html": "ch09-solist-ai.html",
+    "ch09-spresense.html": "ch10-spresense.html",
+    "ch10-uno-q.html": "ch11-uno-q.html",
+    "ch11-microbit.html": "ch12-microbit.html",
+    "ch12-rp2040.html": "ch13-rp2040.html",
+    "ch13-others.html": "ch14-others.html",
+}
+
+REDIRECT_PAGE = """<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="refresh" content="0; url={target}">
+<link rel="canonical" href="{target}">
+<title>移動しました</title>
+</head>
+<body style="font-family:sans-serif;padding:40px;line-height:1.9">
+<p>章番号が変わったため、このページは <a href="{target}">{target}</a> に移動しました。</p>
+<script>location.replace("{target}");</script>
+</body>
+</html>
+"""
+
 HEAD = """<!doctype html>
 <html lang="ja">
 <head>
@@ -117,7 +145,7 @@ def main() -> None:
     OUT.mkdir(exist_ok=True)
     shutil.copy(SRC / "style.css", OUT / "style.css")
     (OUT / ".nojekyll").write_text("")
-    keep = {f for f, *_ in TOC} | {"style.css", ".nojekyll"}
+    keep = {f for f, *_ in TOC} | set(REDIRECTS) | {"style.css", ".nojekyll"}
     for stale in OUT.glob("*.html"):
         if stale.name not in keep:
             stale.unlink()
@@ -133,6 +161,9 @@ def main() -> None:
         )
         (OUT / fname).write_text(page, encoding="utf-8")
         print("wrote", fname)
+    for old, target in REDIRECTS.items():
+        (OUT / old).write_text(REDIRECT_PAGE.format(target=target), encoding="utf-8")
+        print("redirect", old, "->", target)
 
 
 if __name__ == "__main__":
