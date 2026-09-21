@@ -1,5 +1,59 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>10章 Arduino UNO Q（STM32U585 ＋ QRB2210）｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+<li><a href="ch05-scale.html"><span class="num">5章</span>AIの大きさくらべ</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch06-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch07-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch08-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch09-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch10-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch11-uno-q.html" class="current"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch12-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch13-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch14-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
 <div class="chapter-head">
-  <span class="chapter-kicker">第10章</span>
+  <span class="chapter-kicker">第11章</span>
   <h1>Arduino UNO Q（STM32U585 ＋ QRB2210）</h1>
   <p class="chapter-lead">おなじみの Arduino の形に、マイコンと Linux コンピュータが同居。「二刀流」でエッジAIを楽しみます。</p>
 </div>
@@ -67,7 +121,7 @@
 
 <h2>実例1：IchiPing を UNO Q へ（IchiPing-UNO-Q）</h2>
 
-<p>7章の IchiPing（音で窓の開け閉めを当てる）の UNO Q 版です。</p>
+<p>8章の IchiPing（音で窓の開け閉めを当てる）の UNO Q 版です。</p>
 <ul>
   <li>STM32U585：スピーカーとマイクの入出力をリアルタイムで担当</li>
   <li>QRB2210：音の処理と、1次元 CNN による推論を担当</li>
@@ -94,7 +148,7 @@
 
 <h2>実例2：アクリル板の楽器を UNO Q へ（acrylic_pan_uno_q）</h2>
 
-<p>8章のアクリル板の楽器を、UNO Q で作りなおしたものです。</p>
+<p>9章のアクリル板の楽器を、UNO Q で作りなおしたものです。</p>
 <ul>
   <li>STM32U585：加速度センサー（KX134）を SPI で 1秒に25,600回 読み、たたいた瞬間に 512サンプルを切り出す</li>
   <li>QRB2210：特徴量を計算して、128-32-12 のモデルで12エリアを推論。Web画面を表示し、FluidSynth で音を鳴らす</li>
@@ -126,3 +180,19 @@
     <li>ちくわ笛ロボット：実機での結果が出たら追記する。</li>
   </ul>
 </div>
+
+<nav class="pager"><a class="prev" href="ch10-spresense.html"><small>← まえへ</small>9章 Sony Spresense（CXD5602）</a><a class="next" href="ch12-microbit.html"><small>つぎへ →</small>11章 micro:bit（nRF52833）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>

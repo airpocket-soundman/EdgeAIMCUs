@@ -32,18 +32,19 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 <li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
 <li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
 <li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+<li><a href="ch05-scale.html"><span class="num">5章</span>AIの大きさくらべ</a></li>
 </ol>
 <h2>第2部 ボード＆実例編</h2>
 <ol>
-<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
-<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
-<li><a href="ch07-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
-<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
-<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
-<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
-<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
-<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
-<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+<li><a href="ch06-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch07-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch08-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch09-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch10-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch11-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch12-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch13-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch14-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
 </ol>
 <h2>付録</h2>
 <ol>
@@ -73,28 +74,28 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
         <a href="https://github.com/airpocket-soundman/UHD-challenge">UHD-challenge</a> <span class="tag ai">AI</span>
         <a href="https://github.com/airpocket-soundman/IchiPing_solist_AI">IchiPing_solist_AI</a>（音の係）
         HydroSynth、M5StickS3_TOF、M5StickS3_GP2Y0E03、AtomS3_I2S_TX、AtomS3_color_sensor_test、CoreS3-Neopixel-easy-control、lvgl_MCP、roller_can_card_puter_control、m5dial_test、M5BT_HID、M5Tab-logic-analyzer（信号発生器）、Unit-HPDL-1414、Unit-LD8035E、Unit-LTP305G
-      </td><td class="num">2</td><td><a href="ch05-esp32s3.html">5章</a></td>
+      </td><td class="num">2</td><td><a href="ch06-esp32s3.html">6章</a></td>
     </tr>
     <tr>
       <td><b>ESP32-P4</b></td><td>RISC-V ×2</td>
       <td>
         <a href="https://github.com/airpocket-soundman/pico-faces-tab5">pico-faces-tab5</a> <span class="tag ai">AI</span>
         Tab5_synth、Tab5_SSH_Client、Tab5_thinclient、M5Tab-logic-analyzer、IPB2000_2_3data_indicator
-      </td><td class="num">2</td><td><a href="ch06-esp32p4.html">6章</a></td>
+      </td><td class="num">2</td><td><a href="ch07-esp32p4.html">7章</a></td>
     </tr>
     <tr>
       <td><b>NXP MCX N947</b></td><td>Cortex-M33 ×2 ＋ NPU</td>
       <td>
         <a href="https://github.com/airpocket-soundman/IchiPing">IchiPing</a> <span class="tag ai">AI</span>
         FRDM-MCXN947_demo、FRDM-MCXN947_test
-      </td><td class="num">1</td><td><a href="ch07-mcxn947.html">7章</a></td>
+      </td><td class="num">1</td><td><a href="ch08-mcxn947.html">8章</a></td>
     </tr>
     <tr>
       <td><b>ROHM ML63Q2557</b>（Solist-AI）</td><td>Cortex-M0+ ＋ AxlCORE-ODL</td>
       <td>
         <a href="https://github.com/airpocket-soundman/acrylic_pan">acrylic_pan</a> <span class="tag ai">AI</span>
         <a href="https://github.com/airpocket-soundman/IchiPing_solist_AI">IchiPing_solist_AI</a> <span class="tag ai">AI</span>
-      </td><td class="num">—</td><td><a href="ch08-solist-ai.html">8章</a></td>
+      </td><td class="num">—</td><td><a href="ch09-solist-ai.html">9章</a></td>
     </tr>
     <tr>
       <td><b>Sony CXD5602</b>（Spresense）</td><td>Cortex-M4F ×6</td>
@@ -102,7 +103,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
         <a href="https://github.com/airpocket-soundman/egg-analyzer">egg-analyzer</a> <span class="tag ai">AI</span>
         <a href="https://github.com/airpocket-soundman/MPU6886_spresense">MPU6886_spresense</a> <span class="tag ai">AI</span>
         SORA-Q、SPRESENSE-SORA-Q-challenge（NNC で学習）、Schlieren_photography、Two-phase_interface
-      </td><td class="num">—</td><td><a href="ch09-spresense.html">9章</a></td>
+      </td><td class="num">—</td><td><a href="ch10-spresense.html">10章</a></td>
     </tr>
     <tr>
       <td><b>STM32U585</b> ＋ QRB2210（Arduino UNO Q）</td><td>Cortex-M33 ＋ Cortex-A53 ×4</td>
@@ -110,31 +111,31 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
         <a href="https://github.com/airpocket-soundman/IchiPing-UNO-Q">IchiPing-UNO-Q</a> <span class="tag ai">AI</span>
         <a href="https://github.com/airpocket-soundman/acrylic_pan_uno_q">acrylic_pan_uno_q</a> <span class="tag ai">AI</span>
         <a href="https://github.com/airpocket-soundman/chikuwa-flute-robot">chikuwa-flute-robot</a> <span class="tag ai">AI</span>
-      </td><td class="num">—</td><td><a href="ch10-uno-q.html">10章</a></td>
+      </td><td class="num">—</td><td><a href="ch11-uno-q.html">11章</a></td>
     </tr>
     <tr>
       <td><b>Nordic nRF52833 / nRF51822</b>（micro:bit V2 / V1）</td><td>Cortex-M4F / Cortex-M0</td>
       <td>
         <a href="https://github.com/airpocket-soundman/My_Dad-s_Back">My_Dad-s_Back</a> <span class="tag ai">AI</span>
         micromimit、microgatagot、moon_donuts、bit_chan
-      </td><td class="num">—</td><td><a href="ch11-microbit.html">11章</a></td>
+      </td><td class="num">—</td><td><a href="ch12-microbit.html">12章</a></td>
     </tr>
     <tr>
       <td><b>RP2040</b>（Raspberry Pi Pico）</td><td>Cortex-M0+ ×2</td>
-      <td>Raspberry-Pi-Pico-Hapstack-Bridge</td><td class="num">—</td><td><a href="ch12-rp2040.html">12章</a></td>
+      <td>Raspberry-Pi-Pico-Hapstack-Bridge</td><td class="num">—</td><td><a href="ch13-rp2040.html">13章</a></td>
     </tr>
     <tr>
       <td><b>Kendryte K210</b>（Maix Bit、M5StickV）</td><td>RISC-V 64bit ×2 ＋ KPU</td>
-      <td>SoundVisualizer、SoundCamera、mechanical_display</td><td class="num">—</td><td><a href="ch13-others.html">13章</a></td>
+      <td>SoundVisualizer、SoundCamera、mechanical_display</td><td class="num">—</td><td><a href="ch14-others.html">14章</a></td>
     </tr>
     <tr>
       <td><b>ESP32</b>（初代、ESP32-PICO-D4 を含む）</td><td>Xtensa LX6 ×2</td>
       <td>M5StackSmartScale、Stroboscope、M5Stack_Stroboscope、stackchan_try、M5Stack_LLM（ホスト側）、M5ColorFinderWS、tin-toy-drum-machine、AtomMatrixTree、atomMatrixColorCollector、m5stack、RoverC_FPVCar、grease-weight-scale、ColorMaker2、pcb_design_test、IchiPing（通知用の M5Stamp Pico）</td>
-      <td class="num">9</td><td><a href="ch13-others.html">13章</a></td>
+      <td class="num">9</td><td><a href="ch14-others.html">14章</a></td>
     </tr>
     <tr>
       <td><b>Renesas RA4M1</b>（Arduino UNO R4）</td><td>Cortex-M4F</td>
-      <td>Stroboscope、M5Stack_Stroboscope</td><td class="num">—</td><td><a href="ch13-others.html">13章</a></td>
+      <td>Stroboscope、M5Stack_Stroboscope</td><td class="num">—</td><td><a href="ch14-others.html">14章</a></td>
     </tr>
   </tbody>
 </table>
@@ -172,7 +173,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
   </ul>
 </div>
 
-<nav class="pager"><a class="prev" href="ch13-others.html"><small>← まえへ</small>13章 まだまだいる！ほかのマイコンたち</a></nav>
+<nav class="pager"><a class="prev" href="ch14-others.html"><small>← まえへ</small>13章 まだまだいる！ほかのマイコンたち</a></nav>
 </main>
 </div>
 <footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>

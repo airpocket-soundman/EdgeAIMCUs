@@ -20,15 +20,16 @@ TOC = [
     ("ch02-mcu.html", "第1部 基礎編", "2章", "マイコン（MCU）ってなに？", False),
     ("ch03-ai-on-mcu.html", "第1部 基礎編", "3章", "マイコンでAIを動かすしくみ", False),
     ("ch04-ai-mcus.html", "第1部 基礎編", "4章", "エッジAIを動かせるマイコンたち", False),
-    ("ch05-esp32s3.html", "第2部 ボード＆実例編", "5章", "ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）", False),
-    ("ch06-esp32p4.html", "第2部 ボード＆実例編", "6章", "ESP32-P4（M5Stack Tab5）", False),
-    ("ch07-mcxn947.html", "第2部 ボード＆実例編", "7章", "NXP MCX N947（FRDM-MCXN947）", False),
-    ("ch08-solist-ai.html", "第2部 ボード＆実例編", "8章", "ROHM Solist-AI（ML63Q2557）", False),
-    ("ch09-spresense.html", "第2部 ボード＆実例編", "9章", "Sony Spresense（CXD5602）", False),
-    ("ch10-uno-q.html", "第2部 ボード＆実例編", "10章", "Arduino UNO Q（STM32U585 ＋ QRB2210）", False),
-    ("ch11-microbit.html", "第2部 ボード＆実例編", "11章", "micro:bit（nRF52833）", False),
-    ("ch12-rp2040.html", "第2部 ボード＆実例編", "12章", "RP2040 / RP2350（Raspberry Pi Pico）", False),
-    ("ch13-others.html", "第2部 ボード＆実例編", "13章", "まだまだいる！ほかのマイコンたち", False),
+    ("ch05-scale.html", "第1部 基礎編", "5章", "AIの大きさくらべ", False),
+    ("ch06-esp32s3.html", "第2部 ボード＆実例編", "5章", "ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）", False),
+    ("ch07-esp32p4.html", "第2部 ボード＆実例編", "6章", "ESP32-P4（M5Stack Tab5）", False),
+    ("ch08-mcxn947.html", "第2部 ボード＆実例編", "7章", "NXP MCX N947（FRDM-MCXN947）", False),
+    ("ch09-solist-ai.html", "第2部 ボード＆実例編", "8章", "ROHM Solist-AI（ML63Q2557）", False),
+    ("ch10-spresense.html", "第2部 ボード＆実例編", "9章", "Sony Spresense（CXD5602）", False),
+    ("ch11-uno-q.html", "第2部 ボード＆実例編", "10章", "Arduino UNO Q（STM32U585 ＋ QRB2210）", False),
+    ("ch12-microbit.html", "第2部 ボード＆実例編", "11章", "micro:bit（nRF52833）", False),
+    ("ch13-rp2040.html", "第2部 ボード＆実例編", "12章", "RP2040 / RP2350（Raspberry Pi Pico）", False),
+    ("ch14-others.html", "第2部 ボード＆実例編", "13章", "まだまだいる！ほかのマイコンたち", False),
     ("appendix-candidates.html", "付録", "付録A", "作者のリポジトリに登場したマイコン一覧", False),
 ]
 
@@ -116,6 +117,11 @@ def main() -> None:
     OUT.mkdir(exist_ok=True)
     shutil.copy(SRC / "style.css", OUT / "style.css")
     (OUT / ".nojekyll").write_text("")
+    keep = {f for f, *_ in TOC} | {"style.css", ".nojekyll"}
+    for stale in OUT.glob("*.html"):
+        if stale.name not in keep:
+            stale.unlink()
+            print("removed", stale.name)
     for i, (fname, _, num, title, _) in enumerate(TOC):
         src = SRC / "chapters" / fname
         body = src.read_text(encoding="utf-8")

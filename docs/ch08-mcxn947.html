@@ -32,18 +32,19 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 <li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
 <li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
 <li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+<li><a href="ch05-scale.html"><span class="num">5章</span>AIの大きさくらべ</a></li>
 </ol>
 <h2>第2部 ボード＆実例編</h2>
 <ol>
-<li><a href="ch05-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
-<li><a href="ch06-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
-<li><a href="ch07-mcxn947.html" class="current"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
-<li><a href="ch08-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
-<li><a href="ch09-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
-<li><a href="ch10-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
-<li><a href="ch11-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
-<li><a href="ch12-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
-<li><a href="ch13-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+<li><a href="ch06-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch07-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch08-mcxn947.html" class="current"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch09-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch10-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch11-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch12-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch13-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch14-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
 </ol>
 <h2>付録</h2>
 <ol>
@@ -52,7 +53,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 </nav>
 <main>
 <div class="chapter-head">
-  <span class="chapter-kicker">第7章</span>
+  <span class="chapter-kicker">第8章</span>
   <h1>NXP MCX N947（FRDM-MCXN947）</h1>
   <p class="chapter-lead">AI専用エンジン「NPU」を積んだマイコン。推論にかかる時間は、なんと 2ミリ秒以下です。</p>
 </div>
@@ -157,7 +158,7 @@ MCX N947 の NPU で推論！</code></pre>
   <p>最初は「窓の組み合わせによっては響きがほとんど同じで、32通りのうち14グループまでしか見分けられないだろう」と考えていました。ところが実際には、閉まった窓やドアからも音が少しずつもれていて、その差（−20〜−30dB）をAIがちゃんと拾い、32通りすべてを見分けられることがわかりました。<strong>やってみたら、AIのほうが耳がよかった</strong>。こういう発見があるから、エッジAIはやめられません。</p>
 </div>
 
-<p>IchiPing はこのあと、Arduino UNO Q（10章）や ROHM Solist-AI（8章）にも移植されています。同じアイデアを、性格のちがうマイコンでどう実現するか。章をまたいで読み比べてみてください。</p>
+<p>IchiPing はこのあと、Arduino UNO Q（11章）や ROHM Solist-AI（9章）にも移植されています。同じアイデアを、性格のちがうマイコンでどう実現するか。章をまたいで読み比べてみてください。</p>
 
 <p>リポジトリ：<a href="https://github.com/airpocket-soundman/IchiPing">airpocket-soundman/IchiPing</a></p>
 
@@ -177,7 +178,7 @@ MCX N947 の NPU で推論！</code></pre>
   </ul>
 </div>
 
-<nav class="pager"><a class="prev" href="ch06-esp32p4.html"><small>← まえへ</small>6章 ESP32-P4（M5Stack Tab5）</a><a class="next" href="ch08-solist-ai.html"><small>つぎへ →</small>8章 ROHM Solist-AI（ML63Q2557）</a></nav>
+<nav class="pager"><a class="prev" href="ch07-esp32p4.html"><small>← まえへ</small>6章 ESP32-P4（M5Stack Tab5）</a><a class="next" href="ch09-solist-ai.html"><small>つぎへ →</small>8章 ROHM Solist-AI（ML63Q2557）</a></nav>
 </main>
 </div>
 <footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>

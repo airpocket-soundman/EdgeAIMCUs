@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>5章 AIの大きさくらべ｜エッジAIマイコンのすすめ</title>
+<meta name="description" content="マイコンで小さなAIを動かして遊ぶための入門書『エッジAIマイコンのすすめ』">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22><rect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%23ff7a2f%22/><text x=%2216%22 y=%2222%22 font-size=%2216%22 text-anchor=%22middle%22 fill=%22white%22 font-family=%22sans-serif%22 font-weight=%22bold%22>AI</text></svg>">
+<script>
+try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}
+</script>
+</head>
+<body>
+<header class="site-header">
+  <a class="brand" href="index.html"><span class="brand-chip">AI</span>エッジAIマイコンのすすめ</a>
+  <span class="spacer"></span>
+  <button class="toc-toggle" type="button" onclick="document.body.classList.toggle('show-toc')">目次</button>
+  <button type="button" onclick="toggleTheme()" aria-label="明るさの切り替え">◐</button>
+</header>
+<div class="layout">
+<nav class="sidebar" aria-label="目次">
+<ol>
+<li><a href="index.html">はじめに</a></li>
+</ol>
+<h2>第1部 基礎編</h2>
+<ol>
+<li><a href="ch01-edge-ai.html"><span class="num">1章</span>エッジAIってなに？</a></li>
+<li><a href="ch02-mcu.html"><span class="num">2章</span>マイコン（MCU）ってなに？</a></li>
+<li><a href="ch03-ai-on-mcu.html"><span class="num">3章</span>マイコンでAIを動かすしくみ</a></li>
+<li><a href="ch04-ai-mcus.html"><span class="num">4章</span>エッジAIを動かせるマイコンたち</a></li>
+<li><a href="ch05-scale.html" class="current"><span class="num">5章</span>AIの大きさくらべ</a></li>
+</ol>
+<h2>第2部 ボード＆実例編</h2>
+<ol>
+<li><a href="ch06-esp32s3.html"><span class="num">5章</span>ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></li>
+<li><a href="ch07-esp32p4.html"><span class="num">6章</span>ESP32-P4（M5Stack Tab5）</a></li>
+<li><a href="ch08-mcxn947.html"><span class="num">7章</span>NXP MCX N947（FRDM-MCXN947）</a></li>
+<li><a href="ch09-solist-ai.html"><span class="num">8章</span>ROHM Solist-AI（ML63Q2557）</a></li>
+<li><a href="ch10-spresense.html"><span class="num">9章</span>Sony Spresense（CXD5602）</a></li>
+<li><a href="ch11-uno-q.html"><span class="num">10章</span>Arduino UNO Q（STM32U585 ＋ QRB2210）</a></li>
+<li><a href="ch12-microbit.html"><span class="num">11章</span>micro:bit（nRF52833）</a></li>
+<li><a href="ch13-rp2040.html"><span class="num">12章</span>RP2040 / RP2350（Raspberry Pi Pico）</a></li>
+<li><a href="ch14-others.html"><span class="num">13章</span>まだまだいる！ほかのマイコンたち</a></li>
+</ol>
+<h2>付録</h2>
+<ol>
+<li><a href="appendix-candidates.html"><span class="num">付録A</span>作者のリポジトリに登場したマイコン一覧</a></li>
+</ol>
+</nav>
+<main>
+<div class="chapter-head">
+  <span class="chapter-kicker">第5章</span>
+  <h1>AIの大きさくらべ</h1>
+  <p class="chapter-lead">クラウドの巨大LLMから、ヒューマノイド、ロボットアーム、そしてマイコンの小さなモデルまで。AIの「規模感」を並べて見てみましょう。</p>
+</div>
+
+<h2>なぜ「規模感」が大事なのか</h2>
+
+<p>ここまで読んで、「マイコンのAIって、けっきょく大きいの？ 小さいの？」と思いませんでしたか。</p>
+
+<p>AIの話には、パラメータ、GB、TOPS、FLOPS……といろいろな数字が出てきます。ひとつひとつを丸暗記する必要はありませんが、<strong>「自分が遊んでいるのは、どのあたりの世界なのか」</strong>がわかっていると、道に迷いません。</p>
+
+<p>この章では、いま世の中で動いているAIを大きい順に並べて、それぞれ「どれくらいのメモリと計算が要るのか」「どんなハードウェアで動いているのか」を見比べます。数字はすべて<strong>おおよその目安</strong>です。細かい値より、<strong>ケタ（桁）の感覚</strong>をつかんでください。</p>
+
+<h2>モデルの大きさを一列に並べてみる</h2>
+
+<p>まずは、モデルを置いておくのに必要なメモリの大きさで並べてみましょう。横軸は<b>対数目盛り</b>、つまり右に1目盛り進むと大きさが100倍になります。</p>
+
+<figure>
+  <div class="fig">
+    <svg viewBox="0 0 760 330" role="img" aria-label="AIモデルの大きさを対数目盛りで比較した図">
+      <!-- axis -->
+      <line x1="200" y1="286" x2="740" y2="286" class="line" stroke-width="2"/>
+      <g font-size="11" text-anchor="middle" class="muted">
+        <line x1="200" y1="286" x2="200" y2="292" class="line" stroke-width="2"/><text x="200" y="306">10KB</text>
+        <line x1="332" y1="286" x2="332" y2="292" class="line" stroke-width="2"/><text x="332" y="306">1MB</text>
+        <line x1="465" y1="286" x2="465" y2="292" class="line" stroke-width="2"/><text x="465" y="306">100MB</text>
+        <line x1="598" y1="286" x2="598" y2="292" class="line" stroke-width="2"/><text x="598" y="306">10GB</text>
+        <line x1="730" y1="286" x2="730" y2="292" class="line" stroke-width="2"/><text x="730" y="306">1TB</text>
+      </g>
+      <text x="470" y="324" font-size="12" text-anchor="middle" class="muted">モデルを置いておくのに必要なメモリ（量子化後の目安・対数目盛り）</text>
+      <g font-size="13">
+        <text x="190" y="52" text-anchor="end" font-weight="800">MCUのモデル</text>
+        <rect x="200" y="36" width="172" height="22" rx="6" class="accent"/>
+        <text x="380" y="52" font-size="11" class="muted">10KB〜4MB</text>
+
+        <text x="190" y="92" text-anchor="end">1イシューのモデル</text>
+        <rect x="332" y="76" width="133" height="22" rx="6" class="teal-soft"/>
+        <text x="473" y="92" font-size="11" class="muted">1MB〜100MB（物体検出・単眼デプス）</text>
+
+        <text x="190" y="132" text-anchor="end">アームのポリシー</text>
+        <rect x="430" y="116" width="133" height="22" rx="6" class="teal-soft"/>
+        <text x="571" y="132" font-size="11" class="muted">30MB〜3GB</text>
+
+        <text x="190" y="172" text-anchor="end">ヒューマノイドのVLA</text>
+        <rect x="497" y="156" width="101" height="22" rx="6" class="violet-soft"/>
+        <text x="606" y="172" font-size="11" class="muted">300MB〜10GB</text>
+
+        <text x="190" y="212" text-anchor="end">エッジLLM</text>
+        <rect x="511" y="196" width="80" height="22" rx="6" class="violet-soft"/>
+        <text x="599" y="212" font-size="11" class="muted">0.5GB〜8GB</text>
+
+        <text x="190" y="252" text-anchor="end">クラウドの最新LLM</text>
+        <rect x="664" y="236" width="66" height="22" rx="6" class="surface"/>
+        <polygon points="730,236 745,247 730,258" class="accent"/>
+        <text x="600" y="252" font-size="11" text-anchor="end" class="muted">100GB〜数TB</text>
+      </g>
+    </svg>
+  </div>
+  <figcaption>図5-1 AIモデルの大きさくらべ。いちばん上（マイコン）といちばん下（クラウドのLLM）では、100万倍以上の開きがあります。</figcaption>
+</figure>
+
+<div class="box tip">
+  <span class="box-title">ここがポイント</span>
+  <p>マイコンで動くモデルは、クラウドの最新LLMの<strong>およそ100万分の1〜1000万分の1</strong>の大きさです。「AI」とひとことで言っても、中身の規模はまるで別世界。だからこそ、マイコンには<strong>マイコンに合ったお題</strong>を選ぶことが大切になります。</p>
+</div>
+
+<h2>7段階で見るAIモデル</h2>
+
+<p>もう少しくわしく、代表的なモデルを7つの段階に分けて並べてみます。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>段階</th><th>代表的なモデル</th><th>パラメータ数</th><th>メモリ（量子化後）</th><th>1回の推論の計算量</th><th>動かす場所</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><b>① クラウドの最新LLM</b></td>
+      <td>GPT・Claude・Gemini などの最上位モデル</td>
+      <td>非公開（数千億〜1兆超と推定）</td>
+      <td class="num">100GB〜数TB</td>
+      <td>1トークンあたり 数百G〜数TFLOP</td>
+      <td>データセンターのGPU 数十〜数百枚</td>
+    </tr>
+    <tr>
+      <td><b>② エッジLLM</b></td>
+      <td>Llama 3.2 3B、Phi-3-mini、Gemma 2B、Qwen の小型版</td>
+      <td class="num">1B〜8B</td>
+      <td class="num">0.5GB〜8GB<br><small>（int4 で）</small></td>
+      <td>1トークンあたり 2G〜16GFLOP</td>
+      <td>スマホ、ノートPC、AI SoC</td>
+    </tr>
+    <tr>
+      <td><b>③ ヒューマノイドを動かすモデル</b></td>
+      <td>VLA（視覚・言語・行動モデル）。NVIDIA GR00T N1 系、Figure Helix のような「大きなVLM＋小さな運動ポリシー」の二段構え</td>
+      <td class="num">2B〜7B<br><small>＋運動側 数千万</small></td>
+      <td class="num">数GB〜10GB</td>
+      <td>上位は毎秒 数〜十数回、下位の運動制御は毎秒 200回</td>
+      <td>ロボットに載せたGPUモジュール（Jetson など）</td>
+    </tr>
+    <tr>
+      <td><b>④ ロボットアームを動かすモデル</b></td>
+      <td>π0 のような VLA、ACT や Diffusion Policy のような模倣学習のポリシー</td>
+      <td class="num">3000万〜3B</td>
+      <td class="num">30MB〜3GB</td>
+      <td>毎秒 10〜50回の推論</td>
+      <td>ノートPCのGPU、Jetson</td>
+    </tr>
+    <tr>
+      <td><b>⑤ エッジAI SoC・CPUで動かす物体検出</b></td>
+      <td>YOLOv8n（320万パラメータ、640×640 で 8.7 GFLOPs）、YOLOX-Nano（90万パラメータ）</td>
+      <td class="num">100万〜1000万</td>
+      <td class="num">1MB〜10MB</td>
+      <td>1フレームあたり 1G〜10GFLOP</td>
+      <td>Raspberry Pi、AI SoC（AX630C など）</td>
+    </tr>
+    <tr>
+      <td><b>⑥ 1イシューのモデル</b></td>
+      <td>単眼デプス（Depth Anything V2 Small は約2500万パラメータ）、姿勢推定、顔検出、セグメンテーション</td>
+      <td class="num">500万〜5000万</td>
+      <td class="num">5MB〜100MB</td>
+      <td>1フレームあたり 数G〜数十GFLOP</td>
+      <td>SBC＋NPU、スマホ、AI SoC</td>
+    </tr>
+    <tr>
+      <td><b>⑦ MCUで動くモデル</b></td>
+      <td>キーワード検出（DS-CNN）、人感検出（MobileNet の極小版）、本書の IchiPing（10万パラメータ）、UHD-N（138万）、pico-faces（240万）</td>
+      <td class="num">1万〜300万</td>
+      <td class="num"><b>10KB〜4MB</b><br><small>（int8 で）</small></td>
+      <td>1回あたり <b>10万〜1000万回の積和演算</b></td>
+      <td><b>マイコン</b></td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p style="font-size:14px;color:var(--muted)">※ パラメータ数の「B」は10億。値は各モデルの公表値や一般的な実装からの目安で、実装や量子化のしかたで変わります。クラウドの最新モデルはパラメータ数が公開されていないため、推定値です。</p>
+
+<div class="box aside">
+  <span class="box-title">ちょっと寄り道：フィジカルAIの「二段構え」</span>
+  <p>ヒューマノイドを動かすAIは、1つの大きなモデルで全部やっているわけではありません。多くは<strong>2階建て</strong>です。</p>
+  <ul>
+    <li><b>上の階（考える係）</b>：カメラの映像と言葉から「コップを取る」といった方針を決める。数十億パラメータの大きなモデルで、毎秒数回〜十数回。</li>
+    <li><b>下の階（動かす係）</b>：関節を実際に動かす。数千万パラメータの小さなモデルで、毎秒200回といった速さ。</li>
+  </ul>
+  <p>この形、どこかで見ませんでしたか？ そう、11章の Arduino UNO Q の「重い計算は Linux、正確なタイミングはマイコン」とそっくりです。<strong>大きくて賢いものはゆっくり、小さくて速いものは頻繁に</strong>。ロボットの世界でも、マイコンの世界でも、考え方は同じなんです。</p>
+</div>
+
+<h2>ハードウェアの大きさくらべ</h2>
+
+<p>では、それぞれのモデルを動かすハードウェアはどう違うのでしょうか。メモリ、計算の速さ、消費電力を並べてみます。</p>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th>クラス</th><th>代表例</th><th>メモリ</th><th>計算の速さ（目安）</th><th>消費電力</th><th>動かせるモデル</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>データセンターGPU</td><td>NVIDIA H100 / B200</td>
+      <td class="num">80〜192GB</td><td class="num">1〜4 PFLOPS級<br><small>（低精度演算）</small></td><td class="num">700〜1200W</td><td>①</td>
+    </tr>
+    <tr>
+      <td>デスクトップGPU</td><td>GeForce RTX 4090 / 5090</td>
+      <td class="num">24〜32GB</td><td class="num">100〜400 TOPS級</td><td class="num">300〜600W</td><td>②〜⑥（①の小型版も）</td>
+    </tr>
+    <tr>
+      <td>ロボット用モジュール</td><td>Jetson AGX Orin / Thor</td>
+      <td class="num">32〜128GB</td><td class="num">数百〜2000 TOPS級</td><td class="num">15〜130W</td><td>②〜⑥</td>
+    </tr>
+    <tr>
+      <td>スマホSoC</td><td>Snapdragon / Apple A シリーズ</td>
+      <td class="num">8〜16GB</td><td class="num">NPU 数十 TOPS</td><td class="num">〜10W</td><td>②、⑤、⑥</td>
+    </tr>
+    <tr>
+      <td>SBC（Linux）</td><td>Raspberry Pi 5（＋AIアクセラレータ）</td>
+      <td class="num">4〜16GB</td><td class="num">CPUのみで 数十 GFLOPS<br>アクセラレータ追加で 13〜26 TOPS</td><td class="num">5〜15W</td><td>⑤、⑥（小さな②も）</td>
+    </tr>
+    <tr>
+      <td>エッジAI SoC</td><td>Axera AX630C（M5Stack Module LLM）</td>
+      <td class="num">1〜4GB</td><td class="num">NPU 3.2 TOPS（int8）</td><td class="num">数W</td><td>⑤、⑥、小さな②</td>
+    </tr>
+    <tr>
+      <td><b>NPU内蔵MCU</b></td><td>NXP MCX N947、ROHM Solist-AI</td>
+      <td class="num">SRAM 16KB〜512KB<br>Flash 256KB〜2MB</td><td class="num">CPUだけのときの<br>数十倍の速さ</td><td class="num">0.01〜0.2W</td><td><b>⑦</b></td>
+    </tr>
+    <tr>
+      <td><b>高性能MCU</b></td><td>ESP32-S3 / P4、Spresense、STM32U585</td>
+      <td class="num">SRAM 0.5〜1.5MB<br>＋PSRAM 数MB〜32MB</td><td class="num">0.1〜1 GOPS級</td><td class="num">0.1〜1W</td><td><b>⑦</b>（大きめのものまで）</td>
+    </tr>
+    <tr>
+      <td><b>小型MCU</b></td><td>micro:bit（nRF52833）、RP2040</td>
+      <td class="num">RAM 16〜264KB</td><td class="num">0.01〜0.1 GOPS級</td><td class="num">0.003〜0.05W</td><td><b>⑦</b>（小さめのもの）</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+<p style="font-size:14px;color:var(--muted)">※ TOPS／FLOPS はメーカー公称のピーク値で、実際に出せる速さはその一部です。MCU の GOPS はおおよその実測から見積もった目安です。</p>
+
+<div class="box tip">
+  <span class="box-title">単位のミニ知識</span>
+  <ul>
+    <li><b>FLOPS / OPS</b>：1秒間にできる計算の回数。FLOPS は小数、OPS は整数の演算です。</li>
+    <li><b>G（ギガ）＝10億、T（テラ）＝1兆、P（ペタ）＝1000兆</b>。</li>
+    <li><b>TOPS</b>：1秒に1兆回の演算。NPU の性能でよく使われます。</li>
+    <li><b>MAC（積和演算）</b>：「かけて足す」の1回。1 MAC ≒ 2回の演算と数えるのがふつうです。</li>
+  </ul>
+</div>
+
+<h2>ケタで見ると、こんなに違う</h2>
+
+<div class="cards">
+  <div class="card"><div class="card-emoji">🧠</div><h4>メモリ</h4><p>クラウドLLM 数百GB ÷ MCUのモデル 100KB ＝ <b>約100万〜1000万倍</b></p></div>
+  <div class="card"><div class="card-emoji">⚡</div><h4>計算の速さ</h4><p>データセンターGPU 1 PFLOPS ÷ MCU 0.1 GOPS ＝ <b>約1000万倍</b></p></div>
+  <div class="card"><div class="card-emoji">🔌</div><h4>消費電力</h4><p>GPU 1台 700W ÷ MCU 0.05W ＝ <b>約1万倍</b></p></div>
+  <div class="card"><div class="card-emoji">💴</div><h4>値段</h4><p>数百万円 ÷ 数百円 ＝ <b>約1万倍</b></p></div>
+</div>
+
+<p>数字だけ見ると、マイコンは圧倒的に非力です。でも見方を変えると、<strong>電池1本で、何か月も、誰にも見られずに、ずっと見張り続けられる</strong>のはマイコンだけ。1章で見たエッジAIの持ち味が、この表の裏返しになっているのがわかります。</p>
+
+<h2>マイコンに向いているお題・向いていないお題</h2>
+
+<div class="table-wrap">
+<table>
+  <thead><tr><th></th><th>お題の例</th><th>なぜ？</th></tr></thead>
+  <tbody>
+    <tr><td><b>◎ 得意</b></td><td>音・振動・加速度の分類、キーワード検出、異常検知、小さな画像（64×64 くらい）での検出</td><td>入力データが小さく、答えも少ない数のクラスで済む</td></tr>
+    <tr><td><b>○ 工夫しだい</b></td><td>手書き文字の認識、人物検出、簡単な画像分類、小さな画像生成</td><td>解像度を下げる、前処理でデータを減らす、PSRAM を使う</td></tr>
+    <tr><td><b>△ かなり大変</b></td><td>高解像度の物体検出、単眼デプス、顔認証</td><td>モデルもメモリも一桁大きい。NPU 内蔵チップなら挑戦の余地あり</td></tr>
+    <tr><td><b>× 別のチップの出番</b></td><td>LLMとの対話、ヒューマノイドの制御、動画の理解</td><td>GB単位のメモリが要る。AI SoC や Linux ボードと組み合わせよう</td></tr>
+  </tbody>
+</table>
+</div>
+
+<p>「×」の欄を見て、がっかりしないでください。14章で紹介するように、<strong>マイコンが窓口になって、重い仕事だけを AI SoC にお願いする</strong>という手があります。マイコンは「AIを動かす箱」であると同時に、「AIと現実世界をつなぐ係」でもあるのです。</p>
+
+<div class="box try">
+  <span class="box-title">やってみよう</span>
+  <p>作りたいものを思い浮かべて、上の表のどこに当てはまるか考えてみましょう。もし「△」や「×」だったら、こう問い直してみてください。<strong>「入力をもっと小さくできないか？」「答えの選択肢をもっと減らせないか？」</strong>。たいていのお題は、割り切ることで「◎」の欄に引っ越せます。</p>
+</div>
+
+<nav class="pager"><a class="prev" href="ch04-ai-mcus.html"><small>← まえへ</small>4章 エッジAIを動かせるマイコンたち</a><a class="next" href="ch06-esp32s3.html"><small>つぎへ →</small>5章 ESP32-S3（M5Stack AtomS3 / CoreS3 ほか）</a></nav>
+</main>
+</div>
+<footer class="site-footer">エッジAIマイコンのすすめ ／ airpocket-soundman ／ 執筆中の原稿です。内容は予告なく変わります。</footer>
+<script>
+function toggleTheme() {
+  const root = document.documentElement;
+  const dark = root.dataset.theme ? root.dataset.theme === "dark"
+    : matchMedia("(prefers-color-scheme: dark)").matches;
+  root.dataset.theme = dark ? "light" : "dark";
+  try { localStorage.setItem("theme", root.dataset.theme); } catch (e) {}
+}
+</script>
+</body>
+</html>
