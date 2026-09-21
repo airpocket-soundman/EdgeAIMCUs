@@ -106,9 +106,9 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 
 <p>おまけに、α は「サイコロの種」さえ決めておけばチップの中で毎回同じものを作り直せるので、<strong>メモリに保存しておく必要すらありません</strong>。16KB の世界では、これがとても効いてきます。</p>
 
-<h2>実例1：アクリル板を楽器にする（acrylic_pan）</h2>
+<h2>実例1：アクリル板を楽器にする（SolistPan）</h2>
 
-<p>400×300mm のアクリル板をたたくと、<strong>どこをたたいたかをAIが当てて</strong>、場所ごとにちがう音を鳴らす。スチールドラムのような電子楽器です。センサーは、板に貼った加速度センサー（KX134）<b>たった1つ</b>だけ。</p>
+<p>400×300mm のアクリル板をたたくと、<strong>どこをたたいたかをAIが当てて</strong>、場所ごとにちがう音を鳴らす。スチールドラムのような電子楽器で、作品名は <b>SolistPan（ソリストパン）</b>。Solist-AI の名前をそのままもらっています。センサーは、板に貼った加速度センサー（KX134）<b>たった1つ</b>だけ。</p>
 
 <h3>しくみ</h3>
 <ol>
@@ -132,7 +132,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 
 <p>データを 11回に分けて合計 7,132回たたいて集めたことで、12エリアの正解率が 67% から 89% まで上がりました。ここでも効いたのは<strong>データの量と多様さ</strong>です。</p>
 
-<p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan">airpocket-soundman/acrylic_pan</a></p>
+<p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan">airpocket-soundman/acrylic_pan</a>（ROHM Edge Hack Challenge の応募作品）</p>
 
 <h2>実例2：IchiPing を 16KB に押し込む（IchiPing_solist_AI）</h2>
 
@@ -169,7 +169,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
 <div class="box todo">
   <span class="box-title">執筆メモ</span>
   <ul>
-    <li>acrylic_pan：最新モデルでの実機の推論時間を測りなおして追記する（初期の参考値は、推論とソフトマックスを合わせて約35ミリ秒）。</li>
+    <li>SolistPan：最新モデルでの実機の推論時間を測りなおして追記する（初期の参考値は、推論とソフトマックスを合わせて約35ミリ秒）。</li>
     <li>IchiPing_solist_AI：実機での正解率が出たら追記する。</li>
   </ul>
 </div>
