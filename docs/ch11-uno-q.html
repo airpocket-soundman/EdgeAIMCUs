@@ -119,46 +119,7 @@ try { const t = localStorage.getItem("theme"); if (t) document.documentElement.d
   <p>UNO Q の作品では、AIの推論は Linux 側で動いています。「それってマイコンでAIを動かしてるの？」と聞かれると、正確には「ちがう」。でも、センサーのすぐそばの1枚の基板の上で、ネットにつながずにAIが答えを出しているという意味では、立派なエッジAIです。この本では、マイコンと組み合わせて使うこうしたボードも仲間として紹介していきます。</p>
 </div>
 
-<h2>実例1：IchiPing を UNO Q へ（IchiPing-UNO-Q）</h2>
-
-<p>8章の IchiPing（音で窓の開け閉めを当てる）の UNO Q 版です。</p>
-<ul>
-  <li>STM32U585：スピーカーとマイクの入出力をリアルタイムで担当</li>
-  <li>QRB2210：音の処理と、1次元 CNN による推論を担当</li>
-</ul>
-
-<p>おもしろいのは、<strong>MCX N947 で100%だったモデルを UNO Q の上でそのまま使うと、正解率が20.8%まで落ちた</strong>ことです。マイクやスピーカー、置き場所が変わると、「響き」の聞こえ方も変わってしまうんですね。</p>
-
-<p>そこで、UNO Q の実機でデータを録りなおし、さらに温度変化で音の高さがわずかにずれることを見こして、周波数を少しだけ伸び縮みさせたデータで水増し（データ拡張）しました。その結果、</p>
-
-<div class="table-wrap">
-<table>
-  <thead><tr><th>条件</th><th>32状態</th><th>14グループ</th></tr></thead>
-  <tbody>
-    <tr><td>安定した状態（朝9時）</td><td class="num">91.7%</td><td class="num">100%</td></tr>
-    <tr><td>温度変化で音の高さがずれた状態</td><td class="num">74.7〜81.9%</td><td class="num">100%</td></tr>
-    <tr><td>人の話し声が流れている状態</td><td class="num">81.9%</td><td class="num">100%</td></tr>
-  </tbody>
-</table>
-</div>
-
-<p>まで回復しました。14グループの判定は、どの条件でも100%を保っています。「機械が変われば、AIも学び直し」。エッジAIを別のボードに引っ越すときの、大事な教訓です。</p>
-
-<p>リポジトリ：<a href="https://github.com/airpocket-soundman/IchiPing-UNO-Q">airpocket-soundman/IchiPing-UNO-Q</a></p>
-
-<h2>実例2：SolistPan を UNO Q へ（acrylic_pan_uno_q）</h2>
-
-<p>9章のアクリル板の楽器 <b>SolistPan</b> を、UNO Q で作りなおしたものです。</p>
-<ul>
-  <li>STM32U585：加速度センサー（KX134）を SPI で 1秒に25,600回 読み、たたいた瞬間に 512サンプルを切り出す</li>
-  <li>QRB2210：特徴量を計算して、128-32-12 のモデルで12エリアを推論。Web画面を表示し、FluidSynth で音を鳴らす</li>
-</ul>
-
-<p>Solist-AI では「16KB に収める」ことが最大のテーマでしたが、UNO Q の Linux 側ならメモリはたっぷり。画面や音の演出にも力を入れられます。同じ作品でも、マイコンの性格が変わると<strong>がんばりどころが変わる</strong>のがおもしろいところです。</p>
-
-<p>リポジトリ：<a href="https://github.com/airpocket-soundman/acrylic_pan_uno_q">airpocket-soundman/acrylic_pan_uno_q</a></p>
-
-<h2>実例3：やまびこ1号 ― 音だけを頼りに位置を当てる（chikuwa-flute-robot）</h2>
+<h2>実例：やまびこ1号 ― 音だけを頼りに位置を当てる（chikuwa-flute-robot）</h2>
 
 <p>人の口笛を聞いて、それをスライドホイッスルで吹き返すロボット、<b>やまびこ1号</b>。聞いた音を返すから「やまびこ」です。</p>
 
